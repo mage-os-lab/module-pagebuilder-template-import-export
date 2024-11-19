@@ -1,16 +1,9 @@
 {
     "name": "mage-os/module-pagebuilder-template-import-export",
-    "version": "0.2.2",
     "description": "PageBuilder template import/export module",
     "type": "magento2-module",
     "license": [
         "MIT"
-    ],
-    "repositories": [
-      {
-        "type": "composer",
-        "url": "https://mirror.mage-os.org"
-      }
     ],
     "require": {
         "php": "^8.1",
