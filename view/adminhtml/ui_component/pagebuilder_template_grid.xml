@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <settings>
+        <buttons>
+            <button class="MageOS\PageBuilderTemplateImportExport\Ui\Component\Listing\ImportTemplateButton" name="import_pagebuilder_template" />
+        </buttons>
+        <spinner>columns</spinner>
+        <deps>
+            <dep>pagebuilder_template_grid.pagebuilder_template_grid_data_source</dep>
+        </deps>
+    </settings>
+</listing>

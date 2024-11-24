@@ -1,0 +1,30 @@
+<?php
+use Magento\Backend\Block\Template;
+use Magento\Framework\Escaper;
+
+// phpcs:disable Magento2.Files.LineLength, Generic.Files.LineLength
+/**
+ * @var Escaper $escaper
+ * @var Template $block
+ */
+?>
+
+<div id="mage-os-pagebuilder-template-import-modal" class="mage-os-pagebuilder-template-import-modal" style="display: none;">
+    <div class="mage-os-pagebuilder-template-import-modal-content">
+        <?= $block->getChildHtml(); ?>
+    </div>
+</div>
+
+<script type="text/x-magento-init">
+    {
+        "#mage-os-pagebuilder-template-import-modal": {
+            "Magento_Ui/js/modal/modal": {
+                "type": "slide",
+                "autoOpen": false,
+                "buttons": false,
+                "modalClass": "pagebuilder-template-import",
+                "title": "<?= $block->escapeHtmlAttr(__("Template Import")) ?>"
+            }
+        }
+    }
+</script>
