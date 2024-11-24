@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace MageOS\PageBuilderTemplateImportExport\Model;
 
+use MageOS\PageBuilderTemplateImportExport\Api\TemplateManagementInterface;
 use Magento\Framework\Api\ImageContent;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\DB\DataConverter\DataConversionException;
@@ -15,7 +16,6 @@ use Magento\Framework\Filesystem\Directory\WriteInterface;
 use Magento\PageBuilder\Api\Data\TemplateInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Store\Model\StoreManagerInterface;
-use MageOS\PageBuilderTemplateImportExport\Api\ZipArchive;
 use Magento\Framework\Data\Wysiwyg\Normalizer;
 use MageOS\PageBuilderTemplateImportExport\Helper\Aliases as TemplateAliasHelper;
 use Magento\PageBuilder\Model\TemplateRepository;
@@ -32,9 +32,12 @@ use Magento\Framework\Filesystem\Driver\File;
 use Magento\Cms\Model\BlockFactory;
 use Magento\Cms\Api\BlockRepositoryInterface;
 use Magento\Framework\Xml\Parser as XmlParser;
-use RectorPrefix202208\SebastianBergmann\Diff\Exception;
+use MageOS\PageBuilderTemplateImportExport\Api\DropboxInterface;
+use ZipArchive;
+use FilesystemIterator;
+use Exception;
 
-class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\TemplateManagementInterface
+class TemplateManagement implements TemplateManagementInterface
 {
     /**
      * @param CmsConverter $cmsConverter
@@ -51,25 +54,28 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
      * @param ConvertArray $convertArray
      * @param BlockRepositoryInterface $blockRepository
      * @param BlockFactory $blockFactory
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param XmlParser $xmlParser
+     * @param DropboxInterface $dropbox
      */
     public function __construct(
-        private readonly CmsConverter $cmsConverter,
-        private readonly Filesystem $filesystem,
-        private readonly FileDriver $fileDriver,
-        private readonly StoreManagerInterface $storeManager,
-        private readonly TemplateRepository $templateRepository,
-        private readonly TemplateFactory $templateFactory,
-        private readonly Normalizer $wysiswygNormalizer,
-        private readonly AdapterFactory $imageAdapterFactory,
-        private readonly ImageContentFactory $imageContentFactory,
-        private readonly Database $mediaStorage,
-        private readonly ImageContentValidator $imageContentValidator,
-        private readonly ConvertArray $convertArray,
-        private readonly BlockRepositoryInterface $blockRepository,
-        private readonly BlockFactory $blockFactory,
-        private readonly SearchCriteriaBuilder $searchCriteriaBuilder,
-        private readonly XmlParser $xmlParser
+        protected readonly CmsConverter $cmsConverter,
+        protected readonly Filesystem $filesystem,
+        protected readonly FileDriver $fileDriver,
+        protected readonly StoreManagerInterface $storeManager,
+        protected readonly TemplateRepository $templateRepository,
+        protected readonly TemplateFactory $templateFactory,
+        protected readonly Normalizer $wysiswygNormalizer,
+        protected readonly AdapterFactory $imageAdapterFactory,
+        protected readonly ImageContentFactory $imageContentFactory,
+        protected readonly Database $mediaStorage,
+        protected readonly ImageContentValidator $imageContentValidator,
+        protected readonly ConvertArray $convertArray,
+        protected readonly BlockRepositoryInterface $blockRepository,
+        protected readonly BlockFactory $blockFactory,
+        protected readonly SearchCriteriaBuilder $searchCriteriaBuilder,
+        protected readonly XmlParser $xmlParser,
+        protected DropboxInterface $dropbox
     ) {
     }
 
@@ -80,15 +86,15 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
      * @param string|null $destinationPath
      * @return array
      */
-    private function copyAssetsFilesToMediaDirectory(string $sourcePath, string $destinationPath = null) : array
+    protected function copyAssetsFilesToMediaDirectory(string $sourcePath, string $destinationPath = null): array
     {
         $exceptionMessages = [];
         if (!$destinationPath) {
             $destinationPath = $this->filesystem->getDirectoryRead(DirectoryList::MEDIA)->getAbsolutePath();
         }
-        $flags = \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS;
-        $iterator = new \FilesystemIterator($sourcePath, $flags);
-        /** @var \FilesystemIterator $entity */
+        $flags = FilesystemIterator::SKIP_DOTS | FilesystemIterator::UNIX_PATHS;
+        $iterator = new FilesystemIterator($sourcePath, $flags);
+        /** @var FilesystemIterator $entity */
 
         foreach ($iterator as $entity) {
             try {
@@ -119,13 +125,13 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
      * @throws LocalizedException
      * @throws InputException
      */
-    private function storePreviewImage($preview): ?string
+    protected function storePreviewImage($preview): ?string
     {
         $fileName = preg_replace(
-            "/[^A-Za-z0-9]/",
-            '',
-            str_replace(' ', '-', "import")
-        ) . uniqid() . '.jpg';
+                "/[^A-Za-z0-9]/",
+                '',
+                str_replace(' ', '-', "import")
+            ) . uniqid() . '.jpg';
 
         // phpcs:ignore
         $decodedImage = $preview;
@@ -136,7 +142,6 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
             throw new LocalizedException(__('Unable to get properties from image.'));
         }
 
-        /* @var ImageContent $imageContent */
         $imageContent = $this->imageContentFactory->create();
         $imageContent->setBase64EncodedData(base64_encode($preview));
         $imageContent->setName($fileName);
@@ -156,7 +161,13 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
             $imageFactory = $this->imageAdapterFactory->create();
             $imageFactory->open($fileAbsolutePath);
             $imageFactory->resize(350);
-            $imageFactory->save($thumbAbsolutePath);
+
+            try {
+                $imageFactory->save($thumbAbsolutePath);
+            } catch (Exception $e) {
+                return null;
+            }
+
             $this->mediaStorage->saveFile($fileAbsolutePath);
             $this->mediaStorage->saveFile($thumbAbsolutePath);
             // Store the preview image within the new entity
@@ -172,7 +183,7 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
      * @return array
      * @throws DataConversionException
      */
-    private function convertTemplateHtml($template)  : array
+    private function convertTemplateHtml(TemplateInterface $template): array
     {
         return $this->cmsConverter->convert($template->getTemplate());
     }
@@ -182,12 +193,12 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
      * @return array
      * @throws FileSystemException
      */
-    public function openExportArchive(string $exportFile) : array
+    public function openExportArchive(string $exportFile): array
     {
         $writer = $this->filesystem->getDirectoryWrite(DirectoryList::VAR_EXPORT);
         $exportDestination = $writer->getAbsolutePath() . $exportFile;
-        $zip = new \ZipArchive();
-        $zip->open($exportDestination, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+        $zip = new ZipArchive();
+        $zip->open($exportDestination, ZipArchive::CREATE | ZipArchive::OVERWRITE);
         return [$zip, $writer];
     }
 
@@ -196,35 +207,35 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
      * @return void
      * @throws FileSystemException
      */
-    public function deleteTmpFolder(string $path) : void
+    public function deleteTmpFolder(string $path): void
     {
         $path = $this->filesystem->getDirectoryRead(DirectoryList::VAR_EXPORT)->getAbsolutePath() . $path;
         $this->fileDriver->deleteDirectory($path);
     }
 
     /**
-     * @param \ZipArchive $zip
+     * @param ZipArchive $zip
      * @return void
      */
-    public function closeExportArchive(\ZipArchive $zip) : void
+    public function closeExportArchive(ZipArchive $zip): void
     {
         $zip->close();
     }
 
     /**
      * @param WriteInterface $writer
-     * @param \ZipArchive $zip
+     * @param ZipArchive $zip
      * @param TemplateInterface $template
      * @param string $exportPath
      * @return void
-     * @throws DataConversionException
+     * @throws DataConversionException|FileSystemException
      */
     public function generateTemplateFileAndRelativeAssets(
         WriteInterface $writer,
-        \ZipArchive $zip,
+        ZipArchive $zip,
         TemplateInterface $template,
         string $exportPath
-    ) : void {
+    ): void {
         $convertedTemplate = $this->convertTemplateHtml($template);
         $exportName = TemplateAliasHelper::TEMPLATE_FILE;
         $templateFile = $writer->openFile($exportPath . "/" . $exportName, 'w');
@@ -242,7 +253,6 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
         }
 
         foreach ($convertedTemplate["assets"] as $asset) {
-            /** @var ReadInterface $reader */
             $reader = $this->filesystem->getDirectoryRead(DirectoryList::PUB);
             $zip->addFile(
                 $reader->getAbsolutePath() . $asset,
@@ -262,6 +272,7 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
 
             try {
                 $templateFile->lock();
+
                 try {
                     $templateFile->write($child["content"]);
                 } finally {
@@ -271,7 +282,7 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
                 $templateFile->close();
                 $zip->addFile(
                     $writer->getAbsolutePath() . $exportPath . $exportName,
-                    TemplateAliasHelper::CHILDREN_FOLDER_NAME . "/" .$exportName
+                    TemplateAliasHelper::CHILDREN_FOLDER_NAME . "/" . $exportName
                 );
             }
         }
@@ -279,18 +290,17 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
 
     /**
      * @param WriteInterface $writer
-     * @param \ZipArchive $zip
+     * @param ZipArchive $zip
      * @param TemplateInterface $template
      * @param string $exportPath
      * @return void
-     * @throws DataConversionException
      */
     public function generateTemplatePreviewFile(
         WriteInterface $writer,
-        \ZipArchive $zip,
+        ZipArchive $zip,
         TemplateInterface $template,
         string $exportPath
-    ) : void {
+    ): void {
         $previewFile = $this->filesystem
                 ->getDirectoryRead(DirectoryList::MEDIA)
                 ->getAbsolutePath() . $template->getPreviewImage();
@@ -299,18 +309,18 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
 
     /**
      * @param WriteInterface $writer
-     * @param \ZipArchive $zip
+     * @param ZipArchive $zip
      * @param array $configXml
      * @param string $exportPath
      * @return void
-     * @throws FileSystemException
+     * @throws FileSystemException|LocalizedException
      */
     public function generateConfigFile(
         WriteInterface $writer,
-        \ZipArchive $zip,
+        ZipArchive $zip,
         array $configXml,
         string $exportPath
-    ) : void {
+    ): void {
         $exportName = TemplateAliasHelper::CONFIG_FILE;
         $simpleXmlContents = $this->convertArray->assocToXml($configXml, "config");
         $configXml = $simpleXmlContents->asXML();
@@ -318,6 +328,7 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
 
         try {
             $configFile->lock();
+
             try {
                 $configFile->write($configXml);
             } finally {
@@ -339,25 +350,31 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
      * @param array $config
      * @return string
      * @throws DataConversionException
-     * @throws FileSystemException
+     * @throws FileSystemException|LocalizedException
      */
     public function exportTemplateToArchive(
         string $exportFile,
         string $exportPath,
         TemplateInterface $template,
         array $config
-    ) : string {
+    ): string {
         /**
-         * @var \ZipArchive $zip
+         * @var ZipArchive $zip
          * @var WriteInterface $writer
          */
         list($zip, $writer) = $this->openExportArchive($exportFile);
+
         $this->generateTemplateFileAndRelativeAssets($writer, $zip, $template, $exportPath);
         $this->generateTemplatePreviewFile($writer, $zip, $template, $exportPath);
         $this->generateConfigFile($writer, $zip, $config, $exportPath);
         $this->closeExportArchive($zip);
         $this->deleteTmpFolder($exportPath);
-        return $writer->getAbsolutePath() . $exportFile;
+
+        $file = $writer->getAbsolutePath() . $exportFile;
+
+        $this->dropbox->upload($file);
+
+        return $file;
     }
 
     /**
@@ -367,12 +384,14 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
      * @throws InputException
      * @throws LocalizedException
      * @throws NoSuchEntityException
+     * @throws Exception
      */
-    public function importTemplateFromArchive(string $importPath) : int
+    public function importTemplateFromArchive(string $importPath): int
     {
+        $this->dropbox->download($importPath);
         $importedTemplate = null;
         $reader = $this->filesystem->getDirectoryRead(DirectoryList::VAR_EXPORT);
-        $zip = new \ZipArchive();
+        $zip = new ZipArchive();
         $zip->open($importPath);
         $tmpFolder = $reader->getAbsolutePath() . "tmp";
         $zip->extractTo($tmpFolder);
@@ -416,11 +435,11 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
                 $importedTemplate = $this->templateRepository->save($template);
 
                 $this->fileDriver->deleteDirectory($tmpFolder);
-            } catch (\Exception $e) {
-                throw new \Exception("An error occurred saving template");
+            } catch (Exception $e) {
+                throw new Exception("An error occurred saving template");
             }
         } else {
-            throw new \Exception("An error occurred saving template dependencies");
+            throw new Exception("An error occurred saving template dependencies");
         }
 
         if ($importedTemplate && $importedTemplate->getId()) {
@@ -434,9 +453,8 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
      *
      * @param string $childrenFolderPath
      * @return array
-     * @throws LocalizedException
      */
-    private function importTemplateChildren(string $childrenFolderPath) : array
+    private function importTemplateChildren(string $childrenFolderPath): array
     {
         $childNameSeparator = TemplateAliasHelper::CHILD_NAME_PARAM_SEPARATOR;
         $exceptionMessages = [];
@@ -459,7 +477,7 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
             if (preg_match("/^(.*?)$childNameSeparator(.*?)$childNameSeparator(\d+)\.html$/", $file, $matches)) {
                 $prefix = $matches[1];
                 $id = $matches[2];
-                $order = (int) $matches[3];
+                $order = (int)$matches[3];
                 $content = file_get_contents($childrenFolderPath . '/' . $file);
                 $children[$order] = [
                     'id' => $id,
@@ -477,27 +495,30 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
         foreach ($children as $order => $childCmsBlock) {
             $childCmsBlock["content"] = $this->substituteChildrenIds($childCmsBlock["content"], $children);
             $suffix = 1;
+
             while (true) {
                 try {
                     if (!$this->cmsBlockIdentifierAlreadyExists($childCmsBlock["name"])) {
                         break;
                     }
-                    $childCmsBlock["name"] = $childCmsBlock["name"] . "_" .$suffix;
+                    $childCmsBlock["name"] = $childCmsBlock["name"] . "_" . $suffix;
                     $suffix++;
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     break;
                 }
             }
+
             $blockData = [
                 "content" => $childCmsBlock["content"],
                 "identifier" => $childCmsBlock["name"],
                 "title" => $childCmsBlock["name"]
             ];
+
             try {
                 $cmsBlock = $this->blockFactory->create(['data' => $blockData]);
                 $cmsBlock = $this->blockRepository->save($cmsBlock);
                 $children[$order]["imported_id"] = $cmsBlock->getId();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $exceptionMessages[] = $e->getMessage();
             }
         }
@@ -512,12 +533,13 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
      * @return bool
      * @throws LocalizedException
      */
-    private function cmsBlockIdentifierAlreadyExists(string $identifier): bool
+    protected function cmsBlockIdentifierAlreadyExists(string $identifier): bool
     {
         $searchCriteria = $this->searchCriteriaBuilder
             ->addFilter('identifier', $identifier, 'eq')
             ->create();
         $blocks = $this->blockRepository->getList($searchCriteria)->getItems();
+
         return !empty($blocks);
     }
 
@@ -528,7 +550,7 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
      * @param array $children
      * @return string
      */
-    private function substituteChildrenIds(string $content, array $children) : string
+    protected function substituteChildrenIds(string $content, array $children): string
     {
         foreach ($children as $key => $child) {
             if (isset($child["imported_id"])) {
@@ -539,6 +561,7 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
                 );
             }
         }
+
         return $content;
     }
 }

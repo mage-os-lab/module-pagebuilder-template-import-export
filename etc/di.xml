@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <preference for="MageOS\PageBuilderTemplateImportExport\Api\TemplateManagementInterface" type="MageOS\PageBuilderTemplateImportExport\Model\TemplateManagement" />
+    <preference for="MageOS\PageBuilderTemplateImportExport\Api\TemplateManagementInterface" type="MageOS\PageBuilderTemplateImportExport\Model\TemplateManagement"/>
+    <preference for="MageOS\PageBuilderTemplateImportExport\Api\DropboxInterface" type="MageOS\PageBuilderTemplateImportExport\Service\Dropbox"/>
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
             <argument name="commands" xsi:type="array">
