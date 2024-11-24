@@ -27,8 +27,7 @@ class ExportTemplate extends \Symfony\Component\Console\Command\Command
     public function __construct(
         private readonly TemplateRepository          $templateRepository,
         private readonly TemplateManagementInterface $templateManagement
-    )
-    {
+    ) {
         parent::__construct();
     }
 
@@ -79,10 +78,8 @@ class ExportTemplate extends \Symfony\Component\Console\Command\Command
         $output->setDecorated(true);
 
         if ($templateId = $input->getOption(self::TEMPLATE_ID)) {
-
             try {
                 $template = $this->templateRepository->get($templateId);
-
             } catch (LocalizedException $e) {
                 $output->writeln("Template not found");
             }
@@ -98,23 +95,25 @@ class ExportTemplate extends \Symfony\Component\Console\Command\Command
                         "description" => $input->getOption(self::TEMPLATE_DESCRIPTION_TAG),
                         "themes" => $input->getOption(self::TEMPLATE_THEME_TAGS)
                     ];
-                    $exportedArchivePath = $this->templateManagement->exportTemplateToArchive($exportFile, $exportPath, $template, $config);
-
+                    $exportedArchivePath = $this->templateManagement->exportTemplateToArchive(
+                        $exportFile,
+                        $exportPath,
+                        $template,
+                        $config
+                    );
                 } catch (\Exception $e) {
+                    dd($e->getMessage());
                     $output->writeln("An error occurred generating template export file");
                     return Cli::RETURN_FAILURE;
                 }
-
             } else {
                 $output->writeln("Export path missing");
                 return Cli::RETURN_FAILURE;
             }
-
         } else {
             $output->writeln("Template ID missing");
             return Cli::RETURN_FAILURE;
         }
-
         $output->writeln("Template exported correctly to " . $exportedArchivePath);
         return Cli::RETURN_SUCCESS;
     }

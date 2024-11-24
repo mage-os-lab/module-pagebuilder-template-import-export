@@ -5,11 +5,13 @@ namespace MageOS\PageBuilderTemplateImportExport\DataConverter;
 
 use Magento\Framework\Data\Wysiwyg\Normalizer;
 use Magento\Framework\DB\DataConverter\DataConversionException;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Filter\Template\Tokenizer\Parameter;
 use Magento\Framework\Filter\Template\Tokenizer\ParameterFactory;
 use Magento\Framework\DB\DataConverter\SerializedToJson;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Serialize\Serializer\Serialize;
+use Magento\Cms\Api\BlockRepositoryInterface;
 use MageOS\PageBuilderTemplateImportExport\Helper\Aliases as TemplateAliasHelper;
 
 class CmsConverter extends SerializedToJson
@@ -21,44 +23,65 @@ class CmsConverter extends SerializedToJson
     private $assets = [];
 
     /**
+     * @var array
+     */
+    private $cmsBlocks = [];
+
+    /**
      * @param Normalizer $normalizer
      * @param ParameterFactory $parameterFactory
      * @param Json $json
+     * @param BlockRepositoryInterface $cmsBlockRepository
      * @param Serialize $serialize
      */
     public function __construct(
-        private readonly Normalizer       $normalizer,
+        private readonly Normalizer $normalizer,
         private readonly ParameterFactory $parameterFactory,
-        private readonly Json             $json,
-        Serialize                         $serialize
-    )
-    {
+        private readonly Json $json,
+        private readonly BlockRepositoryInterface $cmsBlockRepository,
+        Serialize $serialize
+    ) {
         parent::__construct($serialize, $json);
     }
 
     /**
+     * Convert template/cms block content extracting and converting children also
+     *
      * @param $value
+     * @param bool $child
      * @return array|string
      * @throws DataConversionException
      */
-    public function convert($value)
+    public function convert($value, bool $child = false) : array|string
     {
-        //Convert and extract widgets media
-        preg_match_all('/(.*?){{widget(.*?)}}/si', $value, $matches, PREG_SET_ORDER);
-        if (empty($matches)) {
-            return $value;
-        }
         $convertedValue = '';
+        //Convert and extract widgets media
+        preg_match_all(
+            '/(.*?){{widget(.*?)}}/si',
+            $value,
+            $matches,
+            PREG_SET_ORDER
+        );
         foreach ($matches as $match) {
             $convertedValue .= $match[1] . '{{widget' . $this->convertWidgetParams($match[2]) . '}}';
         }
-        preg_match_all('/(.*?{{widget.*?}})*(?<ending>.*?)$/si', $value, $matchesTwo, PREG_SET_ORDER);
+        preg_match_all(
+            '/(.*?{{widget.*?}})*(?<ending>.*?)$/si',
+            $value,
+            $matchesTwo,
+            PREG_SET_ORDER
+        );
         if (isset($matchesTwo[0])) {
             $convertedValue .= $matchesTwo[0]['ending'];
         }
 
         //Convert and extract pageBuilder media
-        preg_match_all('/(.*?){{media(.*?)}}/si', $value, $matches, PREG_SET_ORDER);
+        preg_match_all(
+            '/(.*?){{media(.*?)}}/si',
+            $value,
+            $matches,
+            PREG_SET_ORDER
+        );
         foreach ($matches as $match) {
             if (isset($match[2])) {
                 $url = explode("=", $match[2])[1];
@@ -68,15 +91,60 @@ class CmsConverter extends SerializedToJson
             }
         }
 
-        //TODO iterate CMS Block for transposition to html template or other html files generation?
-        return ["value" => $convertedValue, "assets" => $this->assets];
+        //Extract cms blocks needed by template
+        preg_match_all(
+            '/(.*?){{widget\s+type="Magento\\\\Cms\\\\Block\\\\Widget\\\\Block"(.*?)}}/si',
+            $value,
+            $matches,
+            PREG_SET_ORDER
+        );
+        foreach ($matches as $match) {
+            $cmsBlock = $this->extractCmsBlock($match[2]);
+            if (!array_key_exists($cmsBlock["identifier"], $this->cmsBlocks)) {
+                $orderId = count($this->cmsBlocks);
+                $this->cmsBlocks[$cmsBlock["identifier"]] = [
+                    "block_id" => $cmsBlock["block_id"],
+                    "content" => $cmsBlock["content"],
+                    "order" => $orderId
+                ];
+            }
+        }
+        if ($child) {
+            return $convertedValue;
+        }
+        return ["value" => $convertedValue, "assets" => $this->assets, "children" => $this->cmsBlocks];
+    }
+
+    /**
+     * Extract cms block loading it from template extrapolated string
+     *
+     * @param string $stringParams
+     * @return array
+     * @throws DataConversionException
+     * @throws LocalizedException
+     */
+    protected function extractCmsBlock(string $stringParams) : array
+    {
+        /** @var Parameter $tokenizer */
+        $tokenizer = $this->parameterFactory->create();
+        $tokenizer->setString($stringParams);
+        $cmsBlockParameters = $tokenizer->tokenize();
+        if (isset($cmsBlockParameters['block_id'])) {
+            $cmsBlock = $this->cmsBlockRepository->getById($cmsBlockParameters['block_id']);
+            return [
+                "block_id" => $cmsBlock->getId(),
+                "identifier" => $cmsBlock->getIdentifier(),
+                "content" => $this->convert($cmsBlock->getContent(), true)
+            ];
+        }
+        return [];
     }
 
     /**
      * @param $value
      * @return bool
      */
-    protected function isValidJsonValue($value)
+    protected function isValidJsonValue($value) : bool
     {
         return parent::isValidJsonValue($this->normalizer->restoreReservedCharacters($value));
     }
@@ -86,7 +154,7 @@ class CmsConverter extends SerializedToJson
      * @return string
      * @throws DataConversionException
      */
-    private function convertWidgetParams($paramsString)
+    private function convertWidgetParams($paramsString) : string
     {
         /** @var Parameter $tokenizer */
         $tokenizer = $this->parameterFactory->create();
@@ -94,11 +162,14 @@ class CmsConverter extends SerializedToJson
         $widgetParameters = $tokenizer->tokenize();
         if (isset($widgetParameters['conditions_encoded'])) {
             if ($this->isValidJsonValue($widgetParameters['conditions_encoded'])) {
-                $widgetConditionsEncoded = $this->json->unserialize($this->normalizer->restoreReservedCharacters($widgetParameters['conditions_encoded']));
+                $widgetConditionsEncoded = $this->json->unserialize(
+                    $this->normalizer->restoreReservedCharacters($widgetParameters['conditions_encoded'])
+                );
                 foreach ($widgetConditionsEncoded as &$item) {
                     foreach ($item as $label => $value) {
                         if (filter_var($value, FILTER_VALIDATE_URL) && $url = parse_url($value)) {
-                            $item[$label] = str_replace($url["scheme"] . "://" . $url["host"], TemplateAliasHelper::CMS_WIDGET_URL_PLACEHOLDER, $value);
+                            $item[$label] = str_replace($url["scheme"] .
+                                "://" . $url["host"], TemplateAliasHelper::CMS_WIDGET_URL_PLACEHOLDER, $value);
                             if (!in_array($url["path"], $this->assets)) {
                                 $this->assets[] = $url["path"];
                             }

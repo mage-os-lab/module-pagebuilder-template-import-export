@@ -9,9 +9,11 @@ use Magento\Framework\DB\DataConverter\DataConversionException;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Filesystem\Directory\ReadInterface;
 use Magento\Framework\Filesystem\Directory\WriteInterface;
 use Magento\PageBuilder\Api\Data\TemplateInterface;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Store\Model\StoreManagerInterface;
 use MageOS\PageBuilderTemplateImportExport\Api\ZipArchive;
 use Magento\Framework\Data\Wysiwyg\Normalizer;
@@ -27,7 +29,10 @@ use Magento\Framework\Image\AdapterFactory;
 use Magento\MediaStorage\Helper\File\Storage\Database;
 use Magento\Framework\Convert\ConvertArray;
 use Magento\Framework\Filesystem\Driver\File;
+use Magento\Cms\Model\BlockFactory;
+use Magento\Cms\Api\BlockRepositoryInterface;
 use Magento\Framework\Xml\Parser as XmlParser;
+use RectorPrefix202208\SebastianBergmann\Diff\Exception;
 
 class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\TemplateManagementInterface
 {
@@ -35,41 +40,50 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
      * @param CmsConverter $cmsConverter
      * @param Filesystem $filesystem
      * @param File $fileDriver
+     * @param StoreManagerInterface $storeManager
      * @param TemplateRepository $templateRepository
      * @param TemplateFactory $templateFactory
+     * @param Normalizer $wysiswygNormalizer
      * @param AdapterFactory $imageAdapterFactory
      * @param ImageContentFactory $imageContentFactory
      * @param Database $mediaStorage
      * @param ImageContentValidator $imageContentValidator
+     * @param ConvertArray $convertArray
+     * @param BlockRepositoryInterface $blockRepository
+     * @param BlockFactory $blockFactory
      * @param XmlParser $xmlParser
      */
     public function __construct(
-        private readonly CmsConverter          $cmsConverter,
-        private readonly Filesystem            $filesystem,
-        private readonly FileDriver            $fileDriver,
+        private readonly CmsConverter $cmsConverter,
+        private readonly Filesystem $filesystem,
+        private readonly FileDriver $fileDriver,
         private readonly StoreManagerInterface $storeManager,
-        private readonly TemplateRepository    $templateRepository,
-        private readonly TemplateFactory       $templateFactory,
-        private readonly Normalizer            $wysiswygNormalizer,
-        private readonly AdapterFactory        $imageAdapterFactory,
-        private readonly ImageContentFactory   $imageContentFactory,
-        private readonly Database              $mediaStorage,
+        private readonly TemplateRepository $templateRepository,
+        private readonly TemplateFactory $templateFactory,
+        private readonly Normalizer $wysiswygNormalizer,
+        private readonly AdapterFactory $imageAdapterFactory,
+        private readonly ImageContentFactory $imageContentFactory,
+        private readonly Database $mediaStorage,
         private readonly ImageContentValidator $imageContentValidator,
-        private readonly ConvertArray          $convertArray,
-        private readonly XmlParser             $xmlParser
-    ) {}
+        private readonly ConvertArray $convertArray,
+        private readonly BlockRepositoryInterface $blockRepository,
+        private readonly BlockFactory $blockFactory,
+        private readonly SearchCriteriaBuilder $searchCriteriaBuilder,
+        private readonly XmlParser $xmlParser
+    ) {
+    }
 
     /**
+     * Copy exported archive assets files inside pub/media folder
+     *
      * @param string $sourcePath
      * @param string|null $destinationPath
      * @return array
      */
-    private function copyAssetsFilesToMediaDirectory(string $sourcePath, string $destinationPath = null): array
+    private function copyAssetsFilesToMediaDirectory(string $sourcePath, string $destinationPath = null) : array
     {
         $exceptionMessages = [];
-
         if (!$destinationPath) {
-
             $destinationPath = $this->filesystem->getDirectoryRead(DirectoryList::MEDIA)->getAbsolutePath();
         }
         $flags = \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS;
@@ -77,26 +91,28 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
         /** @var \FilesystemIterator $entity */
 
         foreach ($iterator as $entity) {
-
             try {
-
                 if ($entity->isDir()) {
-
-                    $exceptionMessages = array_merge($exceptionMessages, $this->copyAssetsFilesToMediaDirectory($entity->getPathname(), $destinationPath . $entity->getFilename()));
+                    $exceptionMessages = array_merge(
+                        $exceptionMessages,
+                        $this->copyAssetsFilesToMediaDirectory(
+                            $entity->getPathname(),
+                            $destinationPath . $entity->getFilename()
+                        )
+                    );
                 } else {
-
                     $this->fileDriver->copy($entity->getPathname(), $destinationPath . $entity->getFilename());
                 }
             } catch (FileSystemException $exception) {
-
                 $exceptionMessages[] = $exception->getMessage();
             }
         }
-
         return $exceptionMessages;
     }
 
     /**
+     * Store template preview image
+     *
      * @param $preview
      * @return string|null
      * @throws FileSystemException
@@ -105,11 +121,11 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
      */
     private function storePreviewImage($preview): ?string
     {
-        $fileName = preg_replace("/[^A-Za-z0-9]/", '', str_replace(
-                ' ',
-                '-',
-                "import"
-            )) . uniqid() . '.jpg';
+        $fileName = preg_replace(
+            "/[^A-Za-z0-9]/",
+            '',
+            str_replace(' ', '-', "import")
+        ) . uniqid() . '.jpg';
 
         // phpcs:ignore
         $decodedImage = $preview;
@@ -117,7 +133,6 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
         $imageProperties = getimagesizefromstring($decodedImage);
 
         if (!$imageProperties) {
-
             throw new LocalizedException(__('Unable to get properties from image.'));
         }
 
@@ -128,7 +143,6 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
         $imageContent->setType($imageProperties['mime']);
 
         if ($this->imageContentValidator->isValid($imageContent)) {
-
             $mediaDirWrite = $this->filesystem
                 ->getDirectoryWrite(DirectoryList::MEDIA);
             $directory = $mediaDirWrite->getAbsolutePath('.template-manager');
@@ -153,11 +167,13 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
     }
 
     /**
+     *
      * @param TemplateInterface $template
-     * @return array|string
+     * @return array
      * @throws DataConversionException
      */
-    private function convertTemplateHtml($template) {
+    private function convertTemplateHtml($template)  : array
+    {
         return $this->cmsConverter->convert($template->getTemplate());
     }
 
@@ -180,7 +196,8 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
      * @return void
      * @throws FileSystemException
      */
-    public function deleteTmpFolder(string $path) : void {
+    public function deleteTmpFolder(string $path) : void
+    {
         $path = $this->filesystem->getDirectoryRead(DirectoryList::VAR_EXPORT)->getAbsolutePath() . $path;
         $this->fileDriver->deleteDirectory($path);
     }
@@ -189,7 +206,8 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
      * @param \ZipArchive $zip
      * @return void
      */
-    public function closeExportArchive(\ZipArchive $zip) : void {
+    public function closeExportArchive(\ZipArchive $zip) : void
+    {
         $zip->close();
     }
 
@@ -201,26 +219,24 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
      * @return void
      * @throws DataConversionException
      */
-    public function generateTemplateFileAndRelativeAssets(WriteInterface $writer, \ZipArchive $zip, TemplateInterface $template, string $exportPath) : void
-    {
+    public function generateTemplateFileAndRelativeAssets(
+        WriteInterface $writer,
+        \ZipArchive $zip,
+        TemplateInterface $template,
+        string $exportPath
+    ) : void {
         $convertedTemplate = $this->convertTemplateHtml($template);
         $exportName = TemplateAliasHelper::TEMPLATE_FILE;
         $templateFile = $writer->openFile($exportPath . "/" . $exportName, 'w');
 
         try {
-
             $templateFile->lock();
             try {
-
                 $templateFile->write($convertedTemplate["value"]);
-            }
-            finally {
-
+            } finally {
                 $templateFile->unlock();
             }
-        }
-        finally {
-
+        } finally {
             $templateFile->close();
             $zip->addFile($writer->getAbsolutePath() . $exportPath . "/" . $exportName, $exportName);
         }
@@ -233,6 +249,32 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
                 TemplateAliasHelper::ASSETS_FOLDER_NAME . "/" . $asset
             );
         }
+
+        foreach ($convertedTemplate["children"] as $childName => $child) {
+            $exportName = $childName .
+                TemplateAliasHelper::CHILD_NAME_PARAM_SEPARATOR .
+                $child["block_id"] .
+                TemplateAliasHelper::CHILD_NAME_PARAM_SEPARATOR .
+                $child["order"] .
+                ".html";
+            $exportPath .= "/" . TemplateAliasHelper::CHILDREN_FOLDER_NAME . "/";
+            $templateFile = $writer->openFile($exportPath . $exportName, 'w');
+
+            try {
+                $templateFile->lock();
+                try {
+                    $templateFile->write($child["content"]);
+                } finally {
+                    $templateFile->unlock();
+                }
+            } finally {
+                $templateFile->close();
+                $zip->addFile(
+                    $writer->getAbsolutePath() . $exportPath . $exportName,
+                    TemplateAliasHelper::CHILDREN_FOLDER_NAME . "/" .$exportName
+                );
+            }
+        }
     }
 
     /**
@@ -243,9 +285,15 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
      * @return void
      * @throws DataConversionException
      */
-    public function generateTemplatePreviewFile(WriteInterface $writer, \ZipArchive $zip, TemplateInterface $template, string $exportPath) : void
-    {
-        $previewFile = $this->filesystem->getDirectoryRead(DirectoryList::MEDIA)->getAbsolutePath() . $template->getPreviewImage();
+    public function generateTemplatePreviewFile(
+        WriteInterface $writer,
+        \ZipArchive $zip,
+        TemplateInterface $template,
+        string $exportPath
+    ) : void {
+        $previewFile = $this->filesystem
+                ->getDirectoryRead(DirectoryList::MEDIA)
+                ->getAbsolutePath() . $template->getPreviewImage();
         $zip->addFile($previewFile, TemplateAliasHelper::PREVIEW_FILE);
     }
 
@@ -257,27 +305,25 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
      * @return void
      * @throws FileSystemException
      */
-    public function generateConfigFile(WriteInterface $writer, \ZipArchive $zip, array $configXml, string $exportPath) : void
-    {
+    public function generateConfigFile(
+        WriteInterface $writer,
+        \ZipArchive $zip,
+        array $configXml,
+        string $exportPath
+    ) : void {
         $exportName = TemplateAliasHelper::CONFIG_FILE;
-        $simpleXmlContents = $this->convertArray->assocToXml($configXml,"config");
+        $simpleXmlContents = $this->convertArray->assocToXml($configXml, "config");
         $configXml = $simpleXmlContents->asXML();
         $configFile = $writer->openFile($exportPath . "/" . $exportName, 'w');
 
         try {
-
             $configFile->lock();
             try {
-
                 $configFile->write($configXml);
-            }
-            finally {
-
+            } finally {
                 $configFile->unlock();
             }
-        }
-        finally {
-
+        } finally {
             $configFile->close();
             $zip->addFile(
                 $writer->getAbsolutePath() . $exportPath . "/" . $exportName,
@@ -295,8 +341,12 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
      * @throws DataConversionException
      * @throws FileSystemException
      */
-    public function exportTemplateToArchive(string $exportFile, string $exportPath, TemplateInterface $template, array $config) : string
-    {
+    public function exportTemplateToArchive(
+        string $exportFile,
+        string $exportPath,
+        TemplateInterface $template,
+        array $config
+    ) : string {
         /**
          * @var \ZipArchive $zip
          * @var WriteInterface $writer
@@ -316,6 +366,7 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
      * @throws FileSystemException
      * @throws InputException
      * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function importTemplateFromArchive(string $importPath) : int
     {
@@ -330,30 +381,164 @@ class TemplateManagement implements \MageOS\PageBuilderTemplateImportExport\Api\
 
         $baseUrl = trim($this->storeManager->getStore()->getBaseUrl(), "/");
         $baseUrl = $this->wysiswygNormalizer->replaceReservedCharacters($baseUrl);
-        $templateHtmlContent = str_replace(TemplateAliasHelper::CMS_WIDGET_URL_PLACEHOLDER, $baseUrl, $templateHtmlContent);
-        $previewFileName = $this->storePreviewImage($reader->readFile($tmpFolder . "/" . TemplateAliasHelper::PREVIEW_FILE));
+        $templateHtmlContent = str_replace(
+            TemplateAliasHelper::CMS_WIDGET_URL_PLACEHOLDER,
+            $baseUrl,
+            $templateHtmlContent
+        );
+        $previewFileName = $this->storePreviewImage(
+            $reader->readFile($tmpFolder . "/" . TemplateAliasHelper::PREVIEW_FILE)
+        );
         $exceptionMessages = $this->copyAssetsFilesToMediaDirectory(
             $tmpFolder . "/" . TemplateAliasHelper::ASSETS_FOLDER_NAME . "/media/",
             $this->filesystem->getDirectoryRead(DirectoryList::MEDIA)->getAbsolutePath()
         );
+        $childrenImportResult = $this->importTemplateChildren(
+            $tmpFolder . "/" . TemplateAliasHelper::CHILDREN_FOLDER_NAME
+        );
+        $exceptionMessages = array_merge(
+            $exceptionMessages,
+            $childrenImportResult["exceptions"]
+        );
+
+        $templateHtmlContent = $this->substituteChildrenIds($templateHtmlContent, $childrenImportResult["children"]);
 
         if (empty($exceptionMessages)) {
+            try {
+                $config = $this->xmlParser
+                    ->load($tmpFolder . "/" . TemplateAliasHelper::CONFIG_FILE)
+                    ->xmlToArray()["config"];
+                $template = $this->templateFactory->create();
+                $template->setName($config["name"]);
+                $template->setTemplate($templateHtmlContent);
+                $template->setCreatedFor($config["type"]);
+                $template->setPreviewImage($previewFileName);
+                $importedTemplate = $this->templateRepository->save($template);
 
-            $config = $this->xmlParser->load($tmpFolder . "/" . TemplateAliasHelper::CONFIG_FILE)->xmlToArray()["config"];
-            $template = $this->templateFactory->create();
-            $template->setName($config["name"]);
-            $template->setTemplate($templateHtmlContent);
-            $template->setCreatedFor($config["type"]);
-            $template->setPreviewImage($previewFileName);
-            $importedTemplate = $this->templateRepository->save($template);
-            $this->fileDriver->deleteDirectory($tmpFolder);
+                $this->fileDriver->deleteDirectory($tmpFolder);
+            } catch (\Exception $e) {
+                throw new \Exception("An error occurred saving template");
+            }
+        } else {
+            throw new \Exception("An error occurred saving template dependencies");
         }
 
-        if ($importedTemplate) {
-
+        if ($importedTemplate && $importedTemplate->getId()) {
             return intval($importedTemplate->getId());
         }
-
         return 0;
+    }
+
+    /**
+     * Import template's children cms blocks
+     *
+     * @param string $childrenFolderPath
+     * @return array
+     * @throws LocalizedException
+     */
+    private function importTemplateChildren(string $childrenFolderPath) : array
+    {
+        $childNameSeparator = TemplateAliasHelper::CHILD_NAME_PARAM_SEPARATOR;
+        $exceptionMessages = [];
+
+        // Check if the folder exists
+        if (!is_dir($childrenFolderPath)) {
+            $exceptionMessages[] = "Folder 'children' does not exist in var directory.";
+        }
+
+        // Scan the folder
+        $files = scandir($childrenFolderPath);
+
+        foreach ($files as $file) {
+            // Skip non-files
+            if (is_dir($childrenFolderPath . '/' . $file)) {
+                continue;
+            }
+
+            // Match the filename pattern
+            if (preg_match("/^(.*?)$childNameSeparator(.*?)$childNameSeparator(\d+)\.html$/", $file, $matches)) {
+                $prefix = $matches[1];
+                $id = $matches[2];
+                $order = (int) $matches[3];
+                $content = file_get_contents($childrenFolderPath . '/' . $file);
+                $children[$order] = [
+                    'id' => $id,
+                    'name' => $prefix,
+                    'content' => $content
+                ];
+            }
+        }
+
+        // Sort the array by order key
+        usort($children, function ($a, $b) {
+            return key($a) <=> key($b);
+        });
+
+        foreach ($children as $order => $childCmsBlock) {
+            $childCmsBlock["content"] = $this->substituteChildrenIds($childCmsBlock["content"], $children);
+            $suffix = 1;
+            while (true) {
+                try {
+                    if (!$this->cmsBlockIdentifierAlreadyExists($childCmsBlock["name"])) {
+                        break;
+                    }
+                    $childCmsBlock["name"] = $childCmsBlock["name"] . "_" .$suffix;
+                    $suffix++;
+                } catch (\Exception $e) {
+                    break;
+                }
+            }
+            $blockData = [
+                "content" => $childCmsBlock["content"],
+                "identifier" => $childCmsBlock["name"],
+                "title" => $childCmsBlock["name"]
+            ];
+            try {
+                $cmsBlock = $this->blockFactory->create(['data' => $blockData]);
+                $cmsBlock = $this->blockRepository->save($cmsBlock);
+                $children[$order]["imported_id"] = $cmsBlock->getId();
+            } catch (\Exception $e) {
+                $exceptionMessages[] = $e->getMessage();
+            }
+        }
+
+        return ["exceptions" => $exceptionMessages, "children" => $children];
+    }
+
+    /**
+     * Check if a CMS block with the given identifier exists.
+     *
+     * @param string $identifier
+     * @return bool
+     * @throws LocalizedException
+     */
+    private function cmsBlockIdentifierAlreadyExists(string $identifier): bool
+    {
+        $searchCriteria = $this->searchCriteriaBuilder
+            ->addFilter('identifier', $identifier, 'eq')
+            ->create();
+        $blocks = $this->blockRepository->getList($searchCriteria)->getItems();
+        return !empty($blocks);
+    }
+
+    /**
+     * Substitute new cms block ids inside template content.
+     *
+     * @param string $content
+     * @param array $children
+     * @return string
+     */
+    private function substituteChildrenIds(string $content, array $children) : string
+    {
+        foreach ($children as $key => $child) {
+            if (isset($child["imported_id"])) {
+                $content = str_replace(
+                    "block_id=\"" . $child["id"] . "\"",
+                    "block_id=\"" . $child["imported_id"] . "\"",
+                    $content
+                );
+            }
+        }
+        return $content;
     }
 }

@@ -18,8 +18,7 @@ class ImportTemplate extends \Symfony\Component\Console\Command\Command
      */
     public function __construct(
         private readonly TemplateManagementInterface $templateManagement
-    )
-    {
+    ) {
         return parent::__construct();
     }
 
@@ -47,7 +46,6 @@ class ImportTemplate extends \Symfony\Component\Console\Command\Command
         $templateId = $this->templateManagement->importTemplateFromArchive($input->getOption(self::IMPORT_PATH));
 
         if ($templateId) {
-
             $output->writeln("Template archive imported correctly");
             return Cli::RETURN_SUCCESS;
         }

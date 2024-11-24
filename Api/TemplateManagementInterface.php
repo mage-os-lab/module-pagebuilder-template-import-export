@@ -15,7 +15,12 @@ interface TemplateManagementInterface
      * @param array $config
      * @return string
      */
-    public function exportTemplateToArchive(string $exportFile, string $exportPath, TemplateInterface $template, array $config): string;
+    public function exportTemplateToArchive(
+        string $exportFile,
+        string $exportPath,
+        TemplateInterface $template,
+        array $config
+    ): string;
 
     /**
      * @param string $importPath
