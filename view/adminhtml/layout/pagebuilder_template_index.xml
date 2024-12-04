@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
-<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/layout_generic.xsd">
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/layout_generic.xsd">
     <referenceContainer name="content">
-        <block class="Magento\Backend\Block\Template" name="pagebuilder.template.import" template="MageOS_PageBuilderTemplateImportExport::import-template-modal.phtml" aclResource="MageOS_PageBuilderTemplateImportExport::import_pagebuilder_template" />
+        <block class="Magento\Backend\Block\Template" name="pagebuilder.template.import"
+               template="MageOS_PageBuilderTemplateImportExport::import/modal.phtml"
+               aclResource="MageOS_PageBuilderTemplateImportExport::pagebuilder_template_import" >
+        </block>
     </referenceContainer>
 </layout>

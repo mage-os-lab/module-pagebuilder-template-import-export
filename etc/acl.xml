@@ -7,6 +7,7 @@
                     <resource id="Magento_Backend::content_elements">
                         <resource id="Magento_PageBuilder::templates">
                             <resource id="MageOS_PageBuilderTemplateImportExport::pagebuilder_template_import" title="Template import" translate="title" sortOrder="100" />
+                            <resource id="MageOS_PageBuilderTemplateImportExport::pagebuilder_template_export" title="Template export" translate="title" sortOrder="110" />
                         </resource>
                     </resource>
                 </resource>

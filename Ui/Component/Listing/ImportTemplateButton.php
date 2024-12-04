@@ -9,7 +9,7 @@ use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 class ImportTemplateButton implements ButtonProviderInterface
 {
 
-    const ACL_PAGEBUILDER_IMPORT_TEMPLATES = 'MageOS_PageBuilderTemplateImportExport::pagebuilder_template_import';
+    private const ACL_PAGEBUILDER_IMPORT_TEMPLATES = 'MageOS_PageBuilderTemplateImportExport::pagebuilder_template_import';
 
     /**
      * @param AuthorizationInterface $authorization
@@ -37,7 +37,7 @@ class ImportTemplateButton implements ButtonProviderInterface
     }
 
     /**
-     * Verify if  Adobe Stock Search button allowed
+     * Verify if page builder import button allowed
      */
     private function isAllowed(): bool
     {

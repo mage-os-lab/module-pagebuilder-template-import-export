@@ -344,15 +344,9 @@ class TemplateManagement implements TemplateManagementInterface
     }
 
     /**
-     * @param string $exportFile
-     * @param string $exportPath
-     * @param TemplateInterface $template
-     * @param array $config
-     * @return string
-     * @throws DataConversionException
-     * @throws FileSystemException|LocalizedException
+     * @inheritDoc
      */
-    public function exportTemplateToArchive(
+    public function exportTemplate(
         string $exportFile,
         string $exportPath,
         TemplateInterface $template,
@@ -372,19 +366,11 @@ class TemplateManagement implements TemplateManagementInterface
 
         $file = $writer->getAbsolutePath() . $exportFile;
 
-        $this->dropbox->upload($file);
-
         return $file;
     }
 
     /**
-     * @param string $importPath
-     * @return int
-     * @throws FileSystemException
-     * @throws InputException
-     * @throws LocalizedException
-     * @throws NoSuchEntityException
-     * @throws Exception
+     * @inheritDoc
      */
     public function importTemplateFromArchive(string $importPath): int
     {

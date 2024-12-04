@@ -9,13 +9,15 @@ use Magento\PageBuilder\Api\Data\TemplateInterface;
 interface TemplateManagementInterface
 {
     /**
+     * Export template
+     *
      * @param string $exportFile
      * @param string $exportPath
      * @param TemplateInterface $template
      * @param array $config
      * @return string
      */
-    public function exportTemplateToArchive(
+    public function exportTemplate(
         string $exportFile,
         string $exportPath,
         TemplateInterface $template,
@@ -23,6 +25,8 @@ interface TemplateManagementInterface
     ): string;
 
     /**
+     * Import template from archive
+     *
      * @param string $importPath
      * @return int
      */

@@ -95,7 +95,7 @@ class ExportTemplate extends \Symfony\Component\Console\Command\Command
                         "description" => $input->getOption(self::TEMPLATE_DESCRIPTION_TAG),
                         "themes" => $input->getOption(self::TEMPLATE_THEME_TAGS)
                     ];
-                    $exportedArchivePath = $this->templateManagement->exportTemplateToArchive(
+                    $exportedArchivePath = $this->templateManagement->exportTemplate(
                         $exportFile,
                         $exportPath,
                         $template,
