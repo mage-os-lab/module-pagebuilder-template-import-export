@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\PageBuilder\Ui\Component\Listing\Columns\TemplateManagerActions">
-        <plugin name="" type="MageOS\PageBuilderTemplateImportExport\Plugin\Ui\Component\Listing\Columns\TemplateManagerActionsPlugin" />
+        <plugin name="mageos_template_uicomponent_export_action" type="MageOS\PageBuilderTemplateImportExport\Plugin\Ui\Component\Listing\Columns\TemplateManagerActionsPlugin" />
     </type>
 </config>
