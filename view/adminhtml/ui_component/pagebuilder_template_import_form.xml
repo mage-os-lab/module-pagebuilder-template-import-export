@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">pagebuilder_template_import_form.pagebuilder_template_import_data_source</item>
+            <item name="deps" xsi:type="string">pagebuilder_template_import_form.pagebuilder_template_import_data_source</item>
+        </item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+        <item name="label" xsi:type="string" translate="true">Import Template</item>
+        <item name="config" xsi:type="array">
+            <item name="dataScope" xsi:type="string">data</item>
+            <item name="namespace" xsi:type="string">pagebuilder_template_import_form</item>
+        </item>
+    </argument>
+    <dataSource name="pagebuilder_template_import_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">MageOS\PageBuilderTemplateImportExport\Ui\DataProvider\Form\Template\Import</argument>
+            <argument name="name" xsi:type="string">pagebuilder_template_import_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">template_id</argument>
+            <argument name="requestFieldName" xsi:type="string">template_id</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="submit_url" xsi:type="url" path="*/*/save"/>
+                </item>
+            </argument>
+        </argument>
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+    </dataSource>
+    <fieldset name="from_disk">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">true</item>
+                <item name="label" xsi:type="string">Upload from disk</item>
+                <item name="opened" xsi:type="boolean">true</item>
+            </item>
+        </argument>
+        <field name="file_uploader">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="dataType" xsi:type="string">string</item>
+                    <item name="label" xsi:type="string" translate="true">Select file</item>
+                    <item name="component" xsi:type="string">MageOS_PageBuilderTemplateImportExport/js/import/file-uploader</item>
+                    <item name="formElement" xsi:type="string">fileUploader</item>
+                    <item name="dataScope" xsi:type="string">file_uploader</item>
+                    <item name="elementTmpl" xsi:type="string">ui/form/element/uploader/uploader</item>
+                    <item name="uploaderConfig" xsi:type="array">
+                        <item name="url" xsi:type="url" path="pagebuildertemplateio/template/import" />
+                    </item>
+                    <item name="required" xsi:type="boolean">false</item>
+                    <item name="allowedExtensions" xsi:type="string">zip</item>
+                    <item name="maxFileSize" xsi:type="string">4194304</item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string" translate="true">Use zip archive previously exported.</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+    </fieldset>
+    <fieldset name="from_remote">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">true</item>
+                <item name="label" xsi:type="string">Upload from remote</item>
+                <item name="opened" xsi:type="boolean">false</item>
+            </item>
+        </argument>
+    </fieldset>
+</form>

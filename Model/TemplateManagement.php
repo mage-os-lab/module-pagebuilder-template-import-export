@@ -89,6 +89,10 @@ class TemplateManagement implements TemplateManagementInterface
     protected function copyAssetsFilesToMediaDirectory(string $sourcePath, string $destinationPath = null): array
     {
         $exceptionMessages = [];
+        if (!is_dir($sourcePath)) {
+            return [];
+        }
+
         if (!$destinationPath) {
             $destinationPath = $this->filesystem->getDirectoryRead(DirectoryList::MEDIA)->getAbsolutePath();
         }
@@ -374,7 +378,7 @@ class TemplateManagement implements TemplateManagementInterface
      */
     public function importTemplateFromArchive(string $importPath): int
     {
-        $this->dropbox->download($importPath);
+//        $this->dropbox->download($importPath);
         $importedTemplate = null;
         $reader = $this->filesystem->getDirectoryRead(DirectoryList::VAR_EXPORT);
         $zip = new ZipArchive();
@@ -403,10 +407,10 @@ class TemplateManagement implements TemplateManagementInterface
         );
         $exceptionMessages = array_merge(
             $exceptionMessages,
-            $childrenImportResult["exceptions"]
+            $childrenImportResult["exceptions"] ?? []
         );
 
-        $templateHtmlContent = $this->substituteChildrenIds($templateHtmlContent, $childrenImportResult["children"]);
+        $templateHtmlContent = $this->substituteChildrenIds($templateHtmlContent, $childrenImportResult["children"] ?? []);
 
         if (empty($exceptionMessages)) {
             try {
@@ -447,7 +451,7 @@ class TemplateManagement implements TemplateManagementInterface
 
         // Check if the folder exists
         if (!is_dir($childrenFolderPath)) {
-            $exceptionMessages[] = "Folder 'children' does not exist in var directory.";
+            return $exceptionMessages;
         }
 
         // Scan the folder
