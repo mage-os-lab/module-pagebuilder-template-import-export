@@ -55,7 +55,8 @@ class Import extends Action implements HttpPostActionInterface
             $binary = $request->getParam('param_name', 'file_uploader');
 
             if ($uploader->isValid($binary)) {
-                $destinationFolder = $this->filesystem->getDirectoryRead(DirectoryList::VAR_EXPORT)->getAbsolutePath();
+                $destinationFolder = $this->filesystem
+                    ->getDirectoryRead(DirectoryList::VAR_EXPORT)->getAbsolutePath();
 
                 $uploader = $this->uploaderFactory->create(['fileId' => $binary]);
                 $uploader->setFilesDispersion(false);

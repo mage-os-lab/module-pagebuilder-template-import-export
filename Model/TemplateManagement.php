@@ -376,9 +376,11 @@ class TemplateManagement implements TemplateManagementInterface
     /**
      * @inheritDoc
      */
-    public function importTemplateFromArchive(string $importPath): int
+    public function importTemplateFromArchive(string $importPath, bool $downloadFromRemote = false): int
     {
-//        $this->dropbox->download($importPath);
+        if ($downloadFromRemote) {
+            $this->dropbox->download($importPath);
+        }
         $importedTemplate = null;
         $reader = $this->filesystem->getDirectoryRead(DirectoryList::VAR_EXPORT);
         $zip = new ZipArchive();
@@ -410,7 +412,10 @@ class TemplateManagement implements TemplateManagementInterface
             $childrenImportResult["exceptions"] ?? []
         );
 
-        $templateHtmlContent = $this->substituteChildrenIds($templateHtmlContent, $childrenImportResult["children"] ?? []);
+        $templateHtmlContent = $this->substituteChildrenIds(
+            $templateHtmlContent,
+            $childrenImportResult["children"] ?? []
+        );
 
         if (empty($exceptionMessages)) {
             try {

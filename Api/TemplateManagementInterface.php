@@ -25,10 +25,9 @@ interface TemplateManagementInterface
     ): string;
 
     /**
-     * Import template from archive
-     *
      * @param string $importPath
+     * @param bool $downloadFromRemote
      * @return int
      */
-    public function importTemplateFromArchive(string $importPath): int;
+    public function importTemplateFromArchive(string $importPath, bool $downloadFromRemote): int;
 }

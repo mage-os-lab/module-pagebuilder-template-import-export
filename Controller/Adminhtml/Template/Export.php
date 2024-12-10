@@ -83,7 +83,9 @@ class Export extends Action implements HttpGetActionInterface
             $this->logger->critical($e);
         }
 
-        $this->messageManager->addErrorMessage(__('An error occurred while trying to export this template.'));
+        $this->messageManager->addErrorMessage(
+            __('An error occurred while trying to export this template.')
+        );
         return $resultRedirect->setPath('*/*/');
     }
 }
