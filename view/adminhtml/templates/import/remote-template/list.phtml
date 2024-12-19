@@ -1,0 +1,54 @@
+<?php
+use Magento\Backend\Block\Template;
+use Magento\Framework\Escaper;
+
+// phpcs:disable Magento2.Files.LineLength, Generic.Files.LineLength
+/**
+ * @var Escaper $escaper
+ * @var Template $block
+ */
+?>
+
+<div id="mage-os-pagebuilder-template-import-modal-remote-template-list"
+    class="fieldset-wrapper admin__collapsible-block-wrapper opened"
+     data-bind="mageInit: {'collapsible':{'active':true,'openedState':'opened'}}">
+    <div class="fieldset-wrapper-title toggle" data-role="title">
+        <strong class="admin__collapsible-title">
+            <span><?= __("Import template from remote"); ?></span>
+        </strong>
+    </div>
+
+    <div class="fieldset-wrapper-content in collapse media-gallery-container" data-role="content" data-collapsed="true">
+        <div id="remote-template-list-container" class="content masonry-image-grid" data-role="content"></div>
+    </div>
+</div>
+
+<script type="text/x-magento-template" id="pagebuilder-remote-template-item">
+    <div class="remote-template-item masonry-image-column">
+        <div class="media-gallery-wrap">
+            <!-- //TODO manage import controller for remote repositories downloading zip template on fs -->
+            <div data-controller="<?= $escaper->escapeUrl($block->getUrl("pagebuildertemplateie/template/import")) ?>"
+               data-id="<%- data.id %>">
+                <div class="media-gallery-image">
+                    <img src="<%- data.thumb %>" />
+                </div>
+                <div class="masonry-image-description">
+                    <ul class="media-gallery-image-details">
+                        <li class="name" data-ui-id="title"><%- data.name %></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/x-magento-init">
+    {
+        "#remote-template-list-container": {
+            "MageOS_PageBuilderTemplateImportExport/js/import/remote-templates": {
+                "containerSelector" : "#remote-template-list-container",
+                "templateListUrl": "<?= $escaper->escapeUrl($block->getUrl("pagebuildertemplateie/template/remoteList")) ?>"
+            }
+        }
+    }
+</script>

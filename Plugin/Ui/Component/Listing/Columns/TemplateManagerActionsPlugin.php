@@ -40,7 +40,7 @@ class TemplateManagerActionsPlugin
                         $item[$name]['export'] = [
                             'label' => __('Export'),
                             'href' => $this->urlBuilder->getUrl(
-                                'pagebuildertemplateio/template/export',
+                                'pagebuildertemplateie/template/export',
                                 [
                                     'template_id' => $item[$indexField],
                                 ]

@@ -49,7 +49,7 @@
                     <item name="dataScope" xsi:type="string">file_uploader</item>
                     <item name="elementTmpl" xsi:type="string">ui/form/element/uploader/uploader</item>
                     <item name="uploaderConfig" xsi:type="array">
-                        <item name="url" xsi:type="url" path="pagebuildertemplateio/template/import" />
+                        <item name="url" xsi:type="url" path="pagebuildertemplateie/template/import" />
                     </item>
                     <item name="required" xsi:type="boolean">false</item>
                     <item name="allowedExtensions" xsi:type="string">zip</item>
@@ -60,14 +60,5 @@
                 </item>
             </argument>
         </field>
-    </fieldset>
-    <fieldset name="from_remote">
-        <argument name="data" xsi:type="array">
-            <item name="config" xsi:type="array">
-                <item name="collapsible" xsi:type="boolean">true</item>
-                <item name="label" xsi:type="string">Upload from remote</item>
-                <item name="opened" xsi:type="boolean">false</item>
-            </item>
-        </argument>
     </fieldset>
 </form>

@@ -7,7 +7,6 @@ use Spatie\Dropbox\ClientFactory as DropboxFactory;
 use Spatie\Dropbox\Client as DropboxClient;
 use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\App\Filesystem\DirectoryList;
-use Magento\Framework\Exception\FileSystemException;
 
 class Dropbox implements DropboxInterface
 {
@@ -29,35 +28,48 @@ class Dropbox implements DropboxInterface
     }
 
     /**
+     * @param $appKey
+     * @param $appSecret
      * @return void
      */
-    protected function initClient(): void
+    protected function initClient($appKey, $appSecret, $token = ""): void
     {
-        $this->dropbox = $this->dropboxClient->create(['accessTokenOrAppCredentials' => ['dbvqnssrg3xb4bf', 'evxnuuscs182fgw']]);
+        if (!empty($token)) {
+            $this->dropbox = $this->dropboxClient->create(
+                ['accessTokenOrAppCredentials' => $token]
+            );
+        } else {
+            $this->dropbox = $this->dropboxClient->create(
+                ['accessTokenOrAppCredentials' => [$appKey, $appSecret]]
+            );
+        }
     }
 
     /**
-     * @param $filename
+     * @param string $filename
+     * @param string $appKey
+     * @param string $appSecret
      * @return void
      */
-    public function upload($filename): void
+    public function upload(string $filename, string $appKey = "", string $appSecret = ""): void
     {
-        if (empty($this->dropbox)) {
-            $this->initClient();
+        if (empty($this->dropbox) || $appKey !== "") {
+            $this->initClient($appKey, $appSecret);
         }
 
         $this->dropbox->upload(basename($filename), $this->file->read($filename), 'overwrite');
     }
 
     /**
-     * @param $filename
+     * @param string $filename
+     * @param string $appKey
+     * @param string $appSecret
      * @return void
-     * @throws FileSystemException
      */
-    public function download($filename): void
+    public function download(string $filename, string $appKey = "", string $appSecret = ""): void
     {
-        if (empty($this->dropbox)) {
-            $this->initClient();
+        if (empty($this->dropbox) || $appKey !== "") {
+            $this->initClient($appKey, $appSecret);
         }
 
         $stream = $this->dropbox->download(basename($filename));
@@ -66,14 +78,46 @@ class Dropbox implements DropboxInterface
     }
 
     /**
+     * @param string $appKey
+     * @param string $appSecret
+     * @param string $appToken
+     * @param string $path
+     * @param bool $recursive
      * @return array
      */
-    public function listTemplates(): array
-    {
-        if (empty($this->dropbox)) {
-            $this->initClient();
+    public function listTemplates(
+        string $path = "",
+        bool $recursive = false,
+        string $appKey = "",
+        string $appSecret = "",
+        string $appToken = ""
+    ): array {
+        if (empty($this->dropbox) || $appKey !== "") {
+            $this->initClient($appKey, $appSecret, $appToken);
         }
+        return $this->dropbox->listFolder($path, $recursive);
+    }
 
-        return $this->dropbox->listFolder();
+    /**
+     * @param string $path
+     * @param string $format
+     * @param string $size
+     * @param string $appKey
+     * @param string $appSecret
+     * @param string $appToken
+     * @return string
+     */
+    public function getThumbnail(
+        string $path,
+        string $format = "jpeg",
+        string $size = "w64h64",
+        string $appKey = "",
+        string $appSecret = "",
+        string $appToken = ""
+    ):string {
+        if (empty($this->dropbox) || $appKey !== "") {
+            $this->initClient($appKey, $appSecret, $appToken);
+        }
+        return $this->dropbox->getThumbnail($path, $format, $size);
     }
 }

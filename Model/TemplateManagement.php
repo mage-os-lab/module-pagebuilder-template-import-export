@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace MageOS\PageBuilderTemplateImportExport\Model;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Serialize\SerializerInterface;
 use MageOS\PageBuilderTemplateImportExport\Api\TemplateManagementInterface;
 use Magento\Framework\Api\ImageContent;
 use Magento\Framework\App\Filesystem\DirectoryList;
@@ -75,7 +77,9 @@ class TemplateManagement implements TemplateManagementInterface
         protected readonly BlockFactory $blockFactory,
         protected readonly SearchCriteriaBuilder $searchCriteriaBuilder,
         protected readonly XmlParser $xmlParser,
-        protected DropboxInterface $dropbox
+        protected DropboxInterface $dropbox,
+        protected SerializerInterface $serializer,
+        protected ScopeConfigInterface $scopeConfig
     ) {
     }
 
@@ -558,5 +562,59 @@ class TemplateManagement implements TemplateManagementInterface
         }
 
         return $content;
+    }
+
+    /**
+     * @param string $path
+     * @param bool $recursive
+     * @return array
+     */
+    public function listRemoteTemplates(string $path = "", bool $recursive = false): array
+    {
+        //TODO move on a dedicated config Helper
+        $dropboxCredentials = $this->scopeConfig
+            ->getValue('pagebuilder_template_importexport/general/dropbox_credentials');
+
+        $templates = [];
+        foreach ($this->serializer->unserialize($dropboxCredentials) as $credentials) {
+
+            $templateList = $this->dropbox->listTemplates(
+                $path,
+                $recursive,
+                $credentials["app_key"],
+                $credentials["app_secret"],
+                $credentials["app_token"]
+            );
+
+            if (isset($templateList["entries"])) {
+                foreach ($templateList["entries"] as $template) {
+                    if ($template[".tag"] === "file") {
+                        $templateFileName = pathinfo($template["name"], PATHINFO_FILENAME);
+                        $fileExtension = pathinfo($template["name"], PATHINFO_EXTENSION);
+                        if (!isset($templates[$templateFileName])) {
+                            $templates[$templateFileName] = [];
+                        }
+                        //TODO a metadata json/xml file is maybe better of a naming convention between image and zip template
+                        if ($fileExtension === "zip") {
+                            $templates[$templateFileName]["name"] = $templateFileName;
+                            $templates[$templateFileName]["id"] = $template["id"];
+                            $templates[$templateFileName]["file"] = $template["path_display"];
+                            $templates[$templateFileName]["last_update"] = $template["server_modified"];
+                        }
+                        if ($fileExtension === "jpg") {
+                            $templates[$templateFileName]["thumb"] = base64_encode($this->dropbox->getThumbnail(
+                                $template["path_display"],
+                                'jpeg',
+                                'w256h256',
+                                $credentials["app_key"],
+                                $credentials["app_secret"],
+                                $credentials["app_token"]
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+        return $templates;
     }
 }
