@@ -35,6 +35,7 @@ use Magento\Cms\Model\BlockFactory;
 use Magento\Cms\Api\BlockRepositoryInterface;
 use Magento\Framework\Xml\Parser as XmlParser;
 use MageOS\PageBuilderTemplateImportExport\Api\DropboxInterface;
+use MageOS\PageBuilderTemplateImportExport\Helper\ModuleConfig;
 use ZipArchive;
 use FilesystemIterator;
 use Exception;
@@ -79,7 +80,8 @@ class TemplateManagement implements TemplateManagementInterface
         protected readonly XmlParser $xmlParser,
         protected DropboxInterface $dropbox,
         protected SerializerInterface $serializer,
-        protected ScopeConfigInterface $scopeConfig
+        protected ScopeConfigInterface $scopeConfig,
+        protected ModuleConfig $moduleConfig
     ) {
     }
 
@@ -571,12 +573,10 @@ class TemplateManagement implements TemplateManagementInterface
      */
     public function listRemoteTemplates(string $path = "", bool $recursive = false): array
     {
-        //TODO move on a dedicated config Helper
-        $dropboxCredentials = $this->scopeConfig
-            ->getValue('pagebuilder_template_importexport/general/dropbox_credentials');
+        $dropboxCredentials = $this->moduleConfig->getDropboxCredentials();
 
         $templates = [];
-        foreach ($this->serializer->unserialize($dropboxCredentials) as $credentials) {
+        foreach ($dropboxCredentials as $credentials) {
 
             $templateList = $this->dropbox->listTemplates(
                 $path,
