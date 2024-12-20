@@ -28,11 +28,12 @@ class Dropbox implements DropboxInterface
     }
 
     /**
-     * @param $appKey
-     * @param $appSecret
+     * @param string $appKey
+     * @param string $appSecret
+     * @param string $token
      * @return void
      */
-    protected function initClient($appKey, $appSecret, $token = ""): void
+    protected function initClient(string $appKey, string $appSecret, string $token = ""): void
     {
         if (!empty($token)) {
             $this->dropbox = $this->dropboxClient->create(
@@ -95,6 +96,7 @@ class Dropbox implements DropboxInterface
         if (empty($this->dropbox) || $appKey !== "") {
             $this->initClient($appKey, $appSecret, $appToken);
         }
+
         return $this->dropbox->listFolder($path, $recursive);
     }
 
@@ -114,10 +116,11 @@ class Dropbox implements DropboxInterface
         string $appKey = "",
         string $appSecret = "",
         string $appToken = ""
-    ):string {
+    ): string {
         if (empty($this->dropbox) || $appKey !== "") {
             $this->initClient($appKey, $appSecret, $appToken);
         }
+
         return $this->dropbox->getThumbnail($path, $format, $size);
     }
 }
