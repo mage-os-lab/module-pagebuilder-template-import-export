@@ -9,7 +9,8 @@ use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 class ImportTemplateButton implements ButtonProviderInterface
 {
 
-    private const ACL_PAGEBUILDER_IMPORT_TEMPLATES = 'MageOS_PageBuilderTemplateImportExport::pagebuilder_template_import';
+    private const ACL_PAGEBUILDER_IMPORT_TEMPLATES =
+        'MageOS_PageBuilderTemplateImportExport::pagebuilder_template_import';
 
     /**
      * @param AuthorizationInterface $authorization

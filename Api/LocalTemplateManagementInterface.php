@@ -6,7 +6,7 @@ namespace MageOS\PageBuilderTemplateImportExport\Api;
 use Magento\Framework\Filesystem\Directory\WriteInterface;
 use Magento\PageBuilder\Api\Data\TemplateInterface;
 
-interface TemplateManagementInterface
+interface LocalTemplateManagementInterface
 {
     /**
      * Export template
@@ -26,7 +26,8 @@ interface TemplateManagementInterface
 
     /**
      * @param string $importPath
+     * @param bool $downloadFromRemote
      * @return int
      */
-    public function importTemplateFromArchive(string $importPath): int;
+    public function importTemplateFromArchive(string $importPath, bool $downloadFromRemote): int;
 }

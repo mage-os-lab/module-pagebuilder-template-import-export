@@ -3,4 +3,18 @@
     <type name="Magento\PageBuilder\Ui\Component\Listing\Columns\TemplateManagerActions">
         <plugin name="mageos_template_uicomponent_export_action" type="MageOS\PageBuilderTemplateImportExport\Plugin\Ui\Component\Listing\Columns\TemplateManagerActionsPlugin" />
     </type>
+    <type name="MageOS\PageBuilderTemplateImportExport\Block\Adminhtml\Form\Field\FieldArray\AccessCode">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="template" xsi:type="string">MageOS_PageBuilderTemplateImportExport::config/accessCode.phtml</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageOS\PageBuilderTemplateImportExport\Block\Adminhtml\Form\Field\DropboxAppCredentials">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="AccessCodeRenderer" xsi:type="object">MageOS\PageBuilderTemplateImportExport\Block\Adminhtml\Form\Field\FieldArray\AccessCode</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

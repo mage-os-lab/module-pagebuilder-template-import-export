@@ -6,14 +6,11 @@ namespace MageOS\PageBuilderTemplateImportExport\Model;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use MageOS\PageBuilderTemplateImportExport\Api\TemplateManagementInterface;
-use Magento\Framework\Api\ImageContent;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\DB\DataConverter\DataConversionException;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Filesystem\Directory\ReadInterface;
 use Magento\Framework\Filesystem\Directory\WriteInterface;
 use Magento\PageBuilder\Api\Data\TemplateInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
@@ -34,7 +31,6 @@ use Magento\Framework\Filesystem\Driver\File;
 use Magento\Cms\Model\BlockFactory;
 use Magento\Cms\Api\BlockRepositoryInterface;
 use Magento\Framework\Xml\Parser as XmlParser;
-use MageOS\PageBuilderTemplateImportExport\Api\DropboxInterface;
 use ZipArchive;
 use FilesystemIterator;
 use Exception;
@@ -58,7 +54,8 @@ class TemplateManagement implements TemplateManagementInterface
      * @param BlockFactory $blockFactory
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param XmlParser $xmlParser
-     * @param DropboxInterface $dropbox
+     * @param SerializerInterface $serializer
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
         protected readonly CmsConverter $cmsConverter,
@@ -77,7 +74,6 @@ class TemplateManagement implements TemplateManagementInterface
         protected readonly BlockFactory $blockFactory,
         protected readonly SearchCriteriaBuilder $searchCriteriaBuilder,
         protected readonly XmlParser $xmlParser,
-        protected DropboxInterface $dropbox,
         protected SerializerInterface $serializer,
         protected ScopeConfigInterface $scopeConfig
     ) {
@@ -380,12 +376,8 @@ class TemplateManagement implements TemplateManagementInterface
     /**
      * @inheritDoc
      */
-    public function importTemplateFromArchive(string $importPath, bool $downloadFromRemote = false): int
+    public function importTemplateFromArchive(string $importPath): int
     {
-        if ($downloadFromRemote) {
-            $this->dropbox->download($importPath);
-        }
-        $importedTemplate = null;
         $reader = $this->filesystem->getDirectoryRead(DirectoryList::VAR_EXPORT);
         $zip = new ZipArchive();
         $zip->open($importPath);
@@ -562,59 +554,5 @@ class TemplateManagement implements TemplateManagementInterface
         }
 
         return $content;
-    }
-
-    /**
-     * @param string $path
-     * @param bool $recursive
-     * @return array
-     */
-    public function listRemoteTemplates(string $path = "", bool $recursive = false): array
-    {
-        //TODO move on a dedicated config Helper
-        $dropboxCredentials = $this->scopeConfig
-            ->getValue('pagebuilder_template_importexport/general/dropbox_credentials');
-
-        $templates = [];
-        foreach ($this->serializer->unserialize($dropboxCredentials) as $credentials) {
-
-            $templateList = $this->dropbox->listTemplates(
-                $path,
-                $recursive,
-                $credentials["app_key"],
-                $credentials["app_secret"],
-                $credentials["app_token"]
-            );
-
-            if (isset($templateList["entries"])) {
-                foreach ($templateList["entries"] as $template) {
-                    if ($template[".tag"] === "file") {
-                        $templateFileName = pathinfo($template["name"], PATHINFO_FILENAME);
-                        $fileExtension = pathinfo($template["name"], PATHINFO_EXTENSION);
-                        if (!isset($templates[$templateFileName])) {
-                            $templates[$templateFileName] = [];
-                        }
-                        //TODO a metadata json/xml file is maybe better of a naming convention between image and zip template
-                        if ($fileExtension === "zip") {
-                            $templates[$templateFileName]["name"] = $templateFileName;
-                            $templates[$templateFileName]["id"] = $template["id"];
-                            $templates[$templateFileName]["file"] = $template["path_display"];
-                            $templates[$templateFileName]["last_update"] = $template["server_modified"];
-                        }
-                        if ($fileExtension === "jpg") {
-                            $templates[$templateFileName]["thumb"] = base64_encode($this->dropbox->getThumbnail(
-                                $template["path_display"],
-                                'jpeg',
-                                'w256h256',
-                                $credentials["app_key"],
-                                $credentials["app_secret"],
-                                $credentials["app_token"]
-                            ));
-                        }
-                    }
-                }
-            }
-        }
-        return $templates;
     }
 }

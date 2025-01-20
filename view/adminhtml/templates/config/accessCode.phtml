@@ -1,0 +1,33 @@
+<div id="row<?= $this->getInputId(); ?>">
+    <div id="<?= $this->getInputId(); ?>_anchor" style="display: none;"
+         class="action-default ui-button">
+        <?= __("Regenerate refresh token"); ?>
+    </div>
+    <input id="<?= $this->getInputId(); ?>" type="text" name="<?= $this->getInputName(); ?>" value="" />
+    <p><?= __("Insert the generated access code over there."); ?></p>
+</div>
+<script type="text/javascript">
+    (function($) {
+        let accessCodeId = "<?= $this->getInputId(); ?>";
+        let appKeyId = accessCodeId.replace("_access_code", "_app_key");
+        let accesCodeRequestUrl = 'https://www.dropbox.com/oauth2/authorize?response_type=code&token_access_type=offline';
+        let appKeyInput = $("#" + appKeyId);
+        let refreshTokenButtonAnchor = $("#" + accessCodeId + "_anchor");
+        if (appKeyInput.val() !== "") {
+            refreshTokenButtonAnchor.data("anchor", accesCodeRequestUrl + "&client_id=" + $("#" + appKeyId).val());
+            refreshTokenButtonAnchor.show();
+        }
+        appKeyInput.change(function() {
+            let value = appKeyInput.val();
+            if (value !== "") {
+                refreshTokenButtonAnchor.data("anchor", accesCodeRequestUrl + "&client_id=" + value);
+                refreshTokenButtonAnchor.show();
+            } else {
+                refreshTokenButtonAnchor.hide();
+            }
+        });
+        refreshTokenButtonAnchor.click(function() {
+            window.open(refreshTokenButtonAnchor.data("anchor"), '_blank');
+        });
+    })(jQuery);
+</script>

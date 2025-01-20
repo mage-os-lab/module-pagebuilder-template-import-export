@@ -30,12 +30,13 @@ define([
                 success: $.proxy(function (response) {
                     $(self.containerSelector).html();
                     let remoteTemplateTpl = template('#pagebuilder-remote-template-item');
-                    _.each(response.templates, function(template) {
+                    _.each(response.templates.items, function(template) {
+                        console.log(template);
                         let templateItem = remoteTemplateTpl({
                             data: {
                                 name: template['name'],
                                 id: template['id'],
-                                thumb: "data:image/jpeg;base64," + template['thumb']
+                                thumb: "data:image/jpeg;base64," + template['preview']
                             }
                         });
                         $(self.containerSelector).append(templateItem);

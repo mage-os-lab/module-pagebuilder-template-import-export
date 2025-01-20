@@ -1,0 +1,45 @@
+<?php
+declare(strict_types=1);
+
+namespace MageOS\PageBuilderTemplateImportExport\Console\Command;
+
+use Magento\Framework\Console\Cli;
+use MageOS\PageBuilderTemplateImportExport\Api\RemoteStorageManagementInterface;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputOption;
+
+class UpdateRemoteTemplateList extends \Symfony\Component\Console\Command\Command
+{
+
+    /**
+     * @param RemoteStorageManagementInterface $remoteStorageManagement
+     */
+    public function __construct(
+        private readonly RemoteStorageManagementInterface $remoteStorageManagement
+    ) {
+        return parent::__construct();
+    }
+
+    protected function configure()
+    {
+        $this->setName('pagebuilder:template:update-remote-list');
+        $this->setDescription('Update PageBuilder remote template list.');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $output->setDecorated(true);
+        try {
+            $this->remoteStorageManagement->updateRemoteTemplatesInformations();
+        } catch (\Exception $e) {
+            dd($e);
+            $output->writeln("An error occurred updating the remote template list");
+            return Cli::RETURN_FAILURE;
+        }
+        return Cli::RETURN_SUCCESS;
+    }
+}

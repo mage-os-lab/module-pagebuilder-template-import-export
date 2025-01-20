@@ -17,11 +17,11 @@
                     <label>Enable</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="dropbox_credentials" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="20" translate="label,comment">
+                <field id="dropbox_credentials" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="20" translate="label,comment">
                     <label>Dropbox repositories</label>
-                    <comment><![CDATA[Add valid App key/App secret credentials for dropbox available apps.]]></comment>
+                    <comment><![CDATA[Add valid App key/App secret credentials.<br/>After that generate the refresh token clicking on "Regenerate refresh token", print access token on the input and save config. Refresh Token for the dropbox app will be generated automatically..]]></comment>
                     <frontend_model>MageOS\PageBuilderTemplateImportExport\Block\Adminhtml\Form\Field\DropboxAppCredentials</frontend_model>
-                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <backend_model>MageOS\PageBuilderTemplateImportExport\Model\Config\Backend\ApiKeySerialized</backend_model>
                     <depends>
                         <field id="enable">1</field>
                     </depends>

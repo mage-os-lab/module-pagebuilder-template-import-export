@@ -1,19 +1,26 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="MageOS\PageBuilderTemplateImportExport\Api\TemplateManagementInterface" type="MageOS\PageBuilderTemplateImportExport\Model\TemplateManagement"/>
+    <preference for="MageOS\PageBuilderTemplateImportExport\Api\RemoteStorageManagementInterface" type="MageOS\PageBuilderTemplateImportExport\Model\RemoteStorageManagement"/>
+    <preference for="MageOS\PageBuilderTemplateImportExport\Api\Data\RemoteTemplateInterface" type="MageOS\PageBuilderTemplateImportExport\Model\RemoteTemplate"/>
+    <preference for="MageOS\PageBuilderTemplateImportExport\Api\RemoteTemplateRepositoryInterface" type="MageOS\PageBuilderTemplateImportExport\Model\RemoteTemplateRepository"/>
     <preference for="MageOS\PageBuilderTemplateImportExport\Api\DropboxInterface" type="MageOS\PageBuilderTemplateImportExport\Service\Dropbox"/>
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="pageBuilderTemplateExport" xsi:type="object">MageOS\PageBuilderTemplateImportExport\Console\Command\ExportTemplate</item>
+                <item name="pageBuilderTemplateImport" xsi:type="object">MageOS\PageBuilderTemplateImportExport\Console\Command\ImportTemplate</item>
+                <item name="pageBuilderUpdateTemplateRemoteList" xsi:type="object">MageOS\PageBuilderTemplateImportExport\Console\Command\UpdateRemoteTemplateList</item>
             </argument>
         </arguments>
     </type>
-    <type name="Magento\Framework\Console\CommandListInterface">
+    <type name="MageOS\PageBuilderTemplateImportExport\Api\RemoteTemplateRepositoryInterface">
         <arguments>
-            <argument name="commands" xsi:type="array">
-                <item name="pageBuilderTemplateImport" xsi:type="object">MageOS\PageBuilderTemplateImportExport\Console\Command\ImportTemplate</item>
-            </argument>
+            <argument name="resource" xsi:type="object">MageOS\PageBuilderTemplateImportExport\Model\ResourceModel\RemoteTemplate</argument>
+            <argument name="modelFactory" xsi:type="object">MageOS\PageBuilderTemplateImportExport\Api\Data\RemoteTemplateInterfaceFactory</argument>
+            <argument name="collectionFactory" xsi:type="object">MageOS\PageBuilderTemplateImportExport\Model\ResourceModel\RemoteTemplate\CollectionFactory</argument>
+            <argument name="searchResultsFactory" xsi:type="object">Magento\Framework\Api\SearchResultsInterfaceFactory</argument>
+            <argument name="collectionProcessor" xsi:type="object">Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface</argument>
         </arguments>
     </type>
 </config>

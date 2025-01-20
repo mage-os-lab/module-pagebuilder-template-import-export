@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework/Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="remote_pagebuilder_template" resource="default" engine="innodb" comment="Remote Template Entity">
+        <column name="entity_id" xsi:type="int" nullable="false" identity="true" unsigned="true" comment="Entity ID"/>
+        <column name="template_id" xsi:type="varchar" length="255" nullable="false" comment="Template ID"/>
+        <column name="remote_storage_id" xsi:type="varchar" length="255" nullable="false" comment="Remote Storage ID"/>
+        <column name="template_name" xsi:type="varchar" length="255" nullable="false" comment="Template Name"/>
+        <column name="file_path" xsi:type="varchar" length="255" nullable="false" comment="File Path"/>
+        <column name="preview" xsi:type="longtext" nullable="false" comment="Preview Image"/>
+        <column name="last_update" xsi:type="datetime" nullable="true" comment="Last Update"/>
+        <constraint xsi:type="primary" referenceId="REMOTE_PAGEBUILDER_TEMPLATE_ENITTY_ID">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="REMOTE_PAGEBUILDER_TEMPLATE_UNIQUE">
+            <column name="template_id"/>
+            <column name="remote_storage_id"/>
+        </constraint>
+    </table>
+</schema>

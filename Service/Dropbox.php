@@ -3,8 +3,8 @@
 namespace MageOS\PageBuilderTemplateImportExport\Service;
 
 use MageOS\PageBuilderTemplateImportExport\Api\DropboxInterface;
-use Spatie\Dropbox\ClientFactory as DropboxFactory;
-use Spatie\Dropbox\Client as DropboxClient;
+use MageOS\PageBuilderTemplateImportExport\Service\Dropbox\ClientFactory as DropboxFactory;
+use MageOS\PageBuilderTemplateImportExport\Service\Dropbox\Client as DropboxClient;
 use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\App\Filesystem\DirectoryList;
 
@@ -30,13 +30,21 @@ class Dropbox implements DropboxInterface
     /**
      * @param $appKey
      * @param $appSecret
+     * @param $refreshToken
      * @return void
      */
-    protected function initClient($appKey, $appSecret, $token = ""): void
+    protected function initClient($appKey, $appSecret, $refreshToken = ""): void
     {
-        if (!empty($token)) {
+        if (!empty($refreshToken)) {
+            $dropbox = $this->dropboxClient->create();
+            $authTokenRequest = $dropbox->apiEndpointRequest('oauth2/token', [
+                'grant_type' => 'refresh_token',
+                'refresh_token' => $refreshToken,
+                'client_id' => $appKey,
+                'client_secret' => $appSecret
+            ]);
             $this->dropbox = $this->dropboxClient->create(
-                ['accessTokenOrAppCredentials' => $token]
+                ['accessTokenOrAppCredentials' => $authTokenRequest["access_token"]]
             );
         } else {
             $this->dropbox = $this->dropboxClient->create(
@@ -80,7 +88,7 @@ class Dropbox implements DropboxInterface
     /**
      * @param string $appKey
      * @param string $appSecret
-     * @param string $appToken
+     * @param string $refreshToken
      * @param string $path
      * @param bool $recursive
      * @return array
@@ -90,10 +98,31 @@ class Dropbox implements DropboxInterface
         bool $recursive = false,
         string $appKey = "",
         string $appSecret = "",
-        string $appToken = ""
+        string $refreshToken = ""
     ): array {
         if (empty($this->dropbox) || $appKey !== "") {
-            $this->initClient($appKey, $appSecret, $appToken);
+            $this->initClient($appKey, $appSecret, $refreshToken);
+        }
+        return $this->dropbox->listFolder($path, $recursive);
+    }
+
+    /**
+     * @param string $path
+     * @param bool $recursive
+     * @param string $appKey
+     * @param string $appSecret
+     * @param string $refreshToken
+     * @return array
+     */
+    public function listFolder(
+        string $path = "",
+        bool $recursive = false,
+        string $appKey = "",
+        string $appSecret = "",
+        string $refreshToken = ""
+    ): array {
+        if (empty($this->dropbox) || $appKey !== "") {
+            $this->initClient($appKey, $appSecret, $refreshToken);
         }
         return $this->dropbox->listFolder($path, $recursive);
     }
@@ -104,7 +133,7 @@ class Dropbox implements DropboxInterface
      * @param string $size
      * @param string $appKey
      * @param string $appSecret
-     * @param string $appToken
+     * @param string $refreshToken
      * @return string
      */
     public function getThumbnail(
@@ -113,10 +142,10 @@ class Dropbox implements DropboxInterface
         string $size = "w64h64",
         string $appKey = "",
         string $appSecret = "",
-        string $appToken = ""
+        string $refreshToken = ""
     ):string {
         if (empty($this->dropbox) || $appKey !== "") {
-            $this->initClient($appKey, $appSecret, $appToken);
+            $this->initClient($appKey, $appSecret, $refreshToken);
         }
         return $this->dropbox->getThumbnail($path, $format, $size);
     }

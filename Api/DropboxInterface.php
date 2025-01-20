@@ -27,7 +27,7 @@ interface DropboxInterface
      * @param bool $recursive
      * @param string $appKey
      * @param string $appSecret
-     * @param string $appToken
+     * @param string $refreshToken
      * @return array
      */
     public function listTemplates(
@@ -35,7 +35,7 @@ interface DropboxInterface
         bool $recursive = false,
         string $appKey = "",
         string $appSecret = "",
-        string $appToken = ""
+        string $refreshToken = ""
     ): array;
 
     /**
@@ -44,7 +44,7 @@ interface DropboxInterface
      * @param string $size
      * @param string $appKey
      * @param string $appSecret
-     * @param string $appToken
+     * @param string $refreshToken
      * @return string
      */
     public function getThumbnail(
@@ -53,6 +53,6 @@ interface DropboxInterface
         string $size = "w64h64",
         string $appKey = "",
         string $appSecret = "",
-        string $appToken = ""
+        string $refreshToken = ""
     ): string;
 }

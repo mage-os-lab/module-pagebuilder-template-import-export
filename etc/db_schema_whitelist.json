@@ -1,0 +1,17 @@
+{
+    "remote_pagebuilder_template": {
+        "column": {
+            "entity_id": true,
+            "template_id": true,
+            "remote_storage_id": true,
+            "template_name": true,
+            "file_path": true,
+            "preview": true,
+            "last_update": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "REMOTE_PAGEBUILDER_TEMPLATE_TEMPLATE_ID_REMOTE_STORAGE_ID": true
+        }
+    }
+}
