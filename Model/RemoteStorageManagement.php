@@ -14,6 +14,7 @@ use MageOS\PageBuilderTemplateImportExport\Api\Data\RemoteTemplateInterfaceFacto
 use MageOS\PageBuilderTemplateImportExport\Model\ResourceModel\RemoteTemplate\CollectionFactory;
 use Magento\Framework\Xml\Parser as XmlParser;
 use MageOS\PageBuilderTemplateImportExport\Api\DropboxInterface;
+use MageOS\PageBuilderTemplateImportExport\Helper\ModuleConfig;
 
 class RemoteStorageManagement implements RemoteStorageManagementInterface
 {
@@ -25,6 +26,7 @@ class RemoteStorageManagement implements RemoteStorageManagementInterface
      * @param DropboxInterface $dropbox
      * @param SerializerInterface $serializer
      * @param ScopeConfigInterface $scopeConfig
+     * @param ModuleConfig $moduleConfig
      */
     public function __construct(
         protected readonly XmlParser $xmlParser,
@@ -33,7 +35,8 @@ class RemoteStorageManagement implements RemoteStorageManagementInterface
         protected readonly CollectionFactory $remoteTemplateCollectionFactory,
         protected readonly DropboxInterface $dropbox,
         protected readonly SerializerInterface $serializer,
-        protected readonly ScopeConfigInterface $scopeConfig
+        protected readonly ScopeConfigInterface $scopeConfig,
+        protected readonly ModuleConfig $moduleConfig
     ) {
     }
 
@@ -42,11 +45,9 @@ class RemoteStorageManagement implements RemoteStorageManagementInterface
      */
     public function updateRemoteTemplatesInformations(): void
     {
-        $dropboxCredentials = $this->scopeConfig
-            ->getValue('pagebuilder_template_importexport/general/dropbox_credentials');
-
+        $dropboxCredentials = $this->moduleConfig->getDropboxCredentials();
         $templates = [];
-        foreach ($this->serializer->unserialize($dropboxCredentials) as $credentials) {
+        foreach ($dropboxCredentials as $credentials) {
             $templateList = $this->dropbox->listFolder(
                 "",
                 false,

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MageOS\PageBuilderTemplateImportExport\Helper;
 
@@ -35,7 +36,7 @@ class ModuleConfig extends AbstractHelper
     /**
      * @return array|bool|float|int|mixed|string|null
      */
-    public function getDropboxCredentials()
+    public function getDropboxCredentials(): mixed
     {
         $dropboxCredentials = $this->scopeConfig->getValue(self::DROPBOX_CREDENTIALS);
 
