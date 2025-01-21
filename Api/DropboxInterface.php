@@ -30,7 +30,7 @@ interface DropboxInterface
      * @param string $refreshToken
      * @return array
      */
-    public function listTemplates(
+    public function listFolder(
         string $path = "",
         bool $recursive = false,
         string $appKey = "",

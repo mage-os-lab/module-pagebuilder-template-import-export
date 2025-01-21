@@ -47,7 +47,7 @@ class RemoteStorageManagement implements RemoteStorageManagementInterface
 
         $templates = [];
         foreach ($this->serializer->unserialize($dropboxCredentials) as $credentials) {
-            $templateList = $this->dropbox->listTemplates(
+            $templateList = $this->dropbox->listFolder(
                 "",
                 false,
                 $credentials["app_key"],
