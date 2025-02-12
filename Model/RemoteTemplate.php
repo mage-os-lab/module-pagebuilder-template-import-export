@@ -107,4 +107,13 @@ class RemoteTemplate extends AbstractModel implements RemoteTemplateInterface
     {
         return $this->getData(self::LAST_UPDATE);
     }
+
+    /**
+     * @param string $lastUpdate
+     * @return RemoteTemplate
+     */
+    public function setLastUpdate(string $lastUpdate): RemoteTemplate
+    {
+        return $this->setData(self::LAST_UPDATE, $lastUpdate);
+    }
 }

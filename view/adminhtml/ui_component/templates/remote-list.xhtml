@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<div xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_template.xsd">
+    <div class="fieldset-wrapper">
+        <div class="fieldset-wrapper-title">
+            <strong class="title">
+                <span data-bind="i18n: '{{getLabel()}}'" />
+            </strong>
+        </div>
+        <div class="fieldset-wrapper-content" data-bind="scope: '{{getName()}}.{{getName()}}'">
+            <p class="admin__control-support-text">
+                <span data-bind="i18n: '{{getComment()}}'" />
+            </p>
+            <fieldset class="fieldset">
+                <!-- ko template: getTemplate() --><!-- /ko -->
+            </fieldset>
+        </div>
+    </div>
+</div>

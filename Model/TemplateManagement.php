@@ -58,22 +58,22 @@ class TemplateManagement implements TemplateManagementInterface
      * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        protected readonly CmsConverter $cmsConverter,
-        protected readonly Filesystem $filesystem,
-        protected readonly FileDriver $fileDriver,
-        protected readonly StoreManagerInterface $storeManager,
-        protected readonly TemplateRepository $templateRepository,
-        protected readonly TemplateFactory $templateFactory,
-        protected readonly Normalizer $wysiswygNormalizer,
-        protected readonly AdapterFactory $imageAdapterFactory,
-        protected readonly ImageContentFactory $imageContentFactory,
-        protected readonly Database $mediaStorage,
-        protected readonly ImageContentValidator $imageContentValidator,
-        protected readonly ConvertArray $convertArray,
-        protected readonly BlockRepositoryInterface $blockRepository,
-        protected readonly BlockFactory $blockFactory,
-        protected readonly SearchCriteriaBuilder $searchCriteriaBuilder,
-        protected readonly XmlParser $xmlParser,
+        protected CmsConverter $cmsConverter,
+        protected Filesystem $filesystem,
+        protected FileDriver $fileDriver,
+        protected StoreManagerInterface $storeManager,
+        protected TemplateRepository $templateRepository,
+        protected TemplateFactory $templateFactory,
+        protected Normalizer $wysiswygNormalizer,
+        protected AdapterFactory $imageAdapterFactory,
+        protected ImageContentFactory $imageContentFactory,
+        protected Database $mediaStorage,
+        protected ImageContentValidator $imageContentValidator,
+        protected ConvertArray $convertArray,
+        protected BlockRepositoryInterface $blockRepository,
+        protected BlockFactory $blockFactory,
+        protected SearchCriteriaBuilder $searchCriteriaBuilder,
+        protected XmlParser $xmlParser,
         protected SerializerInterface $serializer,
         protected ScopeConfigInterface $scopeConfig
     ) {
@@ -376,15 +376,16 @@ class TemplateManagement implements TemplateManagementInterface
     /**
      * @inheritDoc
      */
-    public function importTemplateFromArchive(string $importPath): int
+    public function importTemplateFromArchive(string $importPath, string $filePath = ""): int
     {
         $reader = $this->filesystem->getDirectoryRead(DirectoryList::VAR_EXPORT);
         $zip = new ZipArchive();
         $zip->open($importPath);
+
         $tmpFolder = $reader->getAbsolutePath() . "tmp";
         $zip->extractTo($tmpFolder);
         $zip->close();
-        $templateHtmlContent = $reader->readFile($tmpFolder . "/" . TemplateAliasHelper::TEMPLATE_FILE);
+        $templateHtmlContent = $reader->readFile($tmpFolder . $filePath . "/" . TemplateAliasHelper::TEMPLATE_FILE);
 
         $baseUrl = trim($this->storeManager->getStore()->getBaseUrl(), "/");
         $baseUrl = $this->wysiswygNormalizer->replaceReservedCharacters($baseUrl);
@@ -394,14 +395,14 @@ class TemplateManagement implements TemplateManagementInterface
             $templateHtmlContent
         );
         $previewFileName = $this->storePreviewImage(
-            $reader->readFile($tmpFolder . "/" . TemplateAliasHelper::PREVIEW_FILE)
+            $reader->readFile($tmpFolder . $filePath . "/" . TemplateAliasHelper::PREVIEW_FILE)
         );
         $exceptionMessages = $this->copyAssetsFilesToMediaDirectory(
-            $tmpFolder . "/" . TemplateAliasHelper::ASSETS_FOLDER_NAME . "/media/",
+            $tmpFolder . $filePath . "/" . TemplateAliasHelper::ASSETS_FOLDER_NAME . "/media/",
             $this->filesystem->getDirectoryRead(DirectoryList::MEDIA)->getAbsolutePath()
         );
         $childrenImportResult = $this->importTemplateChildren(
-            $tmpFolder . "/" . TemplateAliasHelper::CHILDREN_FOLDER_NAME
+            $tmpFolder . $filePath . "/" . TemplateAliasHelper::CHILDREN_FOLDER_NAME
         );
         $exceptionMessages = array_merge(
             $exceptionMessages,
@@ -416,7 +417,7 @@ class TemplateManagement implements TemplateManagementInterface
         if (empty($exceptionMessages)) {
             try {
                 $config = $this->xmlParser
-                    ->load($tmpFolder . "/" . TemplateAliasHelper::CONFIG_FILE)
+                    ->load($tmpFolder . $filePath . "/" . TemplateAliasHelper::CONFIG_FILE)
                     ->xmlToArray()["config"];
                 $template = $this->templateFactory->create();
                 $template->setName($config["name"]);

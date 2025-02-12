@@ -28,12 +28,12 @@ class RemoteTemplateRepository implements RemoteTemplateRepositoryInterface
      * @param CollectionProcessorInterface $collectionProcessor
      */
     public function __construct(
-        protected readonly ResourceModel $resource,
-        protected readonly RemoteTemplateInterfaceFactory $modelFactory,
-        protected readonly CollectionFactory $collectionFactory,
-        protected readonly SearchResultsInterfaceFactory $searchResultsFactory,
-        protected readonly SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
-        protected readonly CollectionProcessorInterface $collectionProcessor
+        protected ResourceModel $resource,
+        protected RemoteTemplateInterfaceFactory $modelFactory,
+        protected CollectionFactory $collectionFactory,
+        protected SearchResultsInterfaceFactory $searchResultsFactory,
+        protected SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
+        protected CollectionProcessorInterface $collectionProcessor
     ) {
     }
 

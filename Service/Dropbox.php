@@ -81,12 +81,17 @@ class Dropbox implements DropboxInterface
      * @param string $filename
      * @param string $appKey
      * @param string $appSecret
+     * @param string $refreshToken
      * @return void
      */
-    public function upload(string $filename, string $appKey = "", string $appSecret = ""): void
-    {
+    public function upload(
+        string $filename,
+        string $appKey = "",
+        string $appSecret = "",
+        string $refreshToken = ""
+    ): void {
         if (empty($this->dropbox) || $appKey !== "") {
-            $this->initClient($appKey, $appSecret);
+            $this->initClient($appKey, $appSecret, $refreshToken);
         }
 
         $this->dropbox->upload(basename($filename), $this->file->read($filename), 'overwrite');
@@ -94,17 +99,46 @@ class Dropbox implements DropboxInterface
 
     /**
      * @param string $filename
+     * @param string $destination
      * @param string $appKey
      * @param string $appSecret
+     * @param string $refreshToken
      * @return void
      */
-    public function download(string $filename, string $appKey = "", string $appSecret = ""): void
-    {
+    public function download(
+        string $filename,
+        string $destination,
+        string $appKey = "",
+        string $appSecret = "",
+        string $refreshToken = ""
+    ): void {
         if (empty($this->dropbox) || $appKey !== "") {
-            $this->initClient($appKey, $appSecret);
+            $this->initClient($appKey, $appSecret, $refreshToken);
         }
         $stream = $this->dropbox->download(basename($filename));
-        $this->file->write($filename . $filename, $stream, 'w');
+        $this->file->write($destination, $stream);
+    }
+
+    /**
+     * @param string $path
+     * @param string $destination
+     * @param string $appKey
+     * @param string $appSecret
+     * @param string $refreshToken
+     * @return void
+     */
+    public function downloadZip(
+        string $path,
+        string $destination,
+        string $appKey = "",
+        string $appSecret = "",
+        string $refreshToken = ""
+    ): void {
+        if (empty($this->dropbox) || $appKey !== "") {
+            $this->initClient($appKey, $appSecret, $refreshToken);
+        }
+        $stream = $this->dropbox->downloadZip($path);
+        $this->file->write($destination, $stream);
     }
 
     /**

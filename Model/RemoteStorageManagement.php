@@ -15,6 +15,7 @@ use MageOS\PageBuilderTemplateImportExport\Model\ResourceModel\RemoteTemplate\Co
 use Magento\Framework\Xml\Parser as XmlParser;
 use MageOS\PageBuilderTemplateImportExport\Api\DropboxInterface;
 use MageOS\PageBuilderTemplateImportExport\Helper\ModuleConfig;
+use Magento\Framework\Stdlib\DateTime\DateTime;
 
 class RemoteStorageManagement implements RemoteStorageManagementInterface
 {
@@ -29,14 +30,15 @@ class RemoteStorageManagement implements RemoteStorageManagementInterface
      * @param ModuleConfig $moduleConfig
      */
     public function __construct(
-        protected readonly XmlParser $xmlParser,
-        protected readonly RemoteTemplateRepositoryInterface $remoteTemplateRepository,
-        protected readonly RemoteTemplateInterfaceFactory $remoteTemplateFactory,
-        protected readonly CollectionFactory $remoteTemplateCollectionFactory,
-        protected readonly DropboxInterface $dropbox,
-        protected readonly SerializerInterface $serializer,
-        protected readonly ScopeConfigInterface $scopeConfig,
-        protected readonly ModuleConfig $moduleConfig
+        protected XmlParser $xmlParser,
+        protected RemoteTemplateRepositoryInterface $remoteTemplateRepository,
+        protected RemoteTemplateInterfaceFactory $remoteTemplateFactory,
+        protected CollectionFactory $remoteTemplateCollectionFactory,
+        protected DropboxInterface $dropbox,
+        protected SerializerInterface $serializer,
+        protected ScopeConfigInterface $scopeConfig,
+        protected ModuleConfig $moduleConfig,
+        protected DateTime $dateTime
     ) {
     }
 
@@ -70,7 +72,8 @@ class RemoteStorageManagement implements RemoteStorageManagementInterface
                         $templates[$templateName]["id"] = $template["id"];
                         foreach ($templateContent["entries"] as $content) {
                             if ($content["name"] === "template.html") {
-                                $templates[$templateName]["last_update"] = $content["server_modified"];
+                                $templates[$templateName]["last_update"] = $this->dateTime
+                                    ->gmtDate(null, $content["server_modified"]);
                             }
                             if ($content["name"] === "preview.jpg") {
                                 $templates[$templateName]["thumb"] = base64_encode($this->dropbox->getThumbnail(
@@ -91,28 +94,23 @@ class RemoteStorageManagement implements RemoteStorageManagementInterface
         }
         foreach ($templates as $name => $template) {
             try {
-                try {
-                    $remoteTemplate = $this->remoteTemplateRepository
-                        ->getByTemplateAndStorageId($template["id"], $template["storage_id"]);
-                } catch (NoSuchEntityException $e) {
-                    $remoteTemplate = $this->remoteTemplateFactory->create();
-                    $remoteTemplate->setTemplateId($template["id"]);
-                    $remoteTemplate->setRemoteStorageId($template["storage_id"]);
-                }
-                $remoteTemplate->setTemplateName($template["name"]);
-                $remoteTemplate->setFilePath($template["file"]);
-                $remoteTemplate->setPreview($template["thumb"]);
-                $this->remoteTemplateRepository->save($remoteTemplate);
-            } catch (\Exception $e) {
-                //TODO LOG SOMETHING
+                $remoteTemplate = $this->remoteTemplateRepository
+                    ->getByTemplateAndStorageId($template["id"], $template["storage_id"]);
+            } catch (NoSuchEntityException $e) {
+                $remoteTemplate = $this->remoteTemplateFactory->create();
+                $remoteTemplate->setTemplateId($template["id"]);
+                $remoteTemplate->setRemoteStorageId($template["storage_id"]);
             }
+            $remoteTemplate->setTemplateName($template["name"]);
+            $remoteTemplate->setFilePath($template["file"]);
+            $remoteTemplate->setPreview($template["thumb"]);
+            $remoteTemplate->setLastUpdate($template["last_update"]);
+            $this->remoteTemplateRepository->save($remoteTemplate);
         }
     }
 
     /**
-     * @param string $path
-     * @param bool $recursive
-     * @return RemoteTemplateInterface[]
+     * @return array|RemoteTemplateInterface[]
      */
     public function listRemoteTemplates(): array
     {

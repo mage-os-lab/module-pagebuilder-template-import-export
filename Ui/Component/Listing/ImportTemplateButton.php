@@ -16,7 +16,7 @@ class ImportTemplateButton implements ButtonProviderInterface
      * @param AuthorizationInterface $authorization
      */
     public function __construct(
-        private readonly AuthorizationInterface $authorization
+        protected AuthorizationInterface $authorization
     ) {
     }
 

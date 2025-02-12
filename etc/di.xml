@@ -23,4 +23,40 @@
             <argument name="collectionProcessor" xsi:type="object">Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface</argument>
         </arguments>
     </type>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+               <item name="pagebuilder_remotetemplate_grid_data_source" xsi:type="string">MageOS\PageBuilderTemplateImportExport\Model\ResourceModel\RemoteTemplate\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="MageOS\PageBuilderTemplateImportExport\Model\ResourceModel\RemoteTemplate\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">remote_pagebuilder_template</argument>
+            <argument name="eventPrefix" xsi:type="string">pagebuilder_remotetemplate_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">remotetemplate_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">MageOS\PageBuilderTemplateImportExport\Model\ResourceModel\RemoteTemplate</argument>
+        </arguments>
+    </type>
+
+    <!-- CUSTOM LOGGER -->
+    <virtualType name="MageOS\PageBuilderTemplateImportExport\LoggerHanlder" type="Magento\Framework\Logger\Handler\Base">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/pagebuilder-template-import-export.log</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MageOS\PageBuilderTemplateImportExport\Logger" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="debug" xsi:type="object">MageOS\PageBuilderTemplateImportExport\LoggerHanlder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="MageOS\PageBuilderTemplateImportExport\Cron\UpdateRemoteTemplateList">
+        <arguments>
+            <argument name="logger" xsi:type="object">MageOS\PageBuilderTemplateImportExport\Logger</argument>
+        </arguments>
+    </type>
+
 </config>

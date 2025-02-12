@@ -34,7 +34,7 @@ class ModuleConfig extends AbstractHelper
     }
 
     /**
-     * @return array|bool|float|int|mixed|string|null
+     * @return mixed
      */
     public function getDropboxCredentials(): mixed
     {
@@ -45,5 +45,19 @@ class ModuleConfig extends AbstractHelper
         }
 
         return $dropboxCredentials;
+    }
+
+    /**
+     * @param string $appKey
+     * @return mixed
+     */
+    public function getDropboxAccountCredentialsByAppKey(string $appKey): mixed
+    {
+        foreach($this->getDropboxCredentials() as $accountCredential) {
+            if ($accountCredential["app_key"] === $appKey) {
+                return $accountCredential;
+            }
+        }
+        return false;
     }
 }

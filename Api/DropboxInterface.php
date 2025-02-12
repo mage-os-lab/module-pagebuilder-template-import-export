@@ -10,17 +10,47 @@ interface DropboxInterface
      * @param string $filename
      * @param string $appKey
      * @param string $appSecret
+     * @param string $refreshToken
      * @return void
      */
-    public function upload(string $filename, string $appKey = "", string $appSecret = ""): void;
+    public function upload(
+        string $filename,
+        string $appKey = "",
+        string $appSecret = "",
+        string $refreshToken = ""
+    ): void;
 
     /**
      * @param string $filename
+     * @param string $destination
      * @param string $appKey
      * @param string $appSecret
+     * @param string $refreshToken
      * @return void
      */
-    public function download(string $filename, string $appKey = "", string $appSecret = ""): void;
+    public function download(
+        string $filename,
+        string $destination,
+        string $appKey = "",
+        string $appSecret = "",
+        string $refreshToken = ""
+    ): void;
+
+    /**
+     * @param string $path
+     * @param string $destination
+     * @param string $appKey
+     * @param string $appSecret
+     * @param string $refreshToken
+     * @return void
+     */
+    public function downloadZip(
+        string $path,
+        string $destination,
+        string $appKey = "",
+        string $appSecret = "",
+        string $refreshToken = ""
+    ): void;
 
     /**
      * @param string $path

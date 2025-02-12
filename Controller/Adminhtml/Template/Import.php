@@ -7,12 +7,10 @@ use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
-use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Filesystem;
 use Magento\Framework\File\UploaderFactory;
 use Magento\Framework\HTTP\Adapter\FileTransferFactory;
-use Magento\PageBuilder\Api\TemplateRepositoryInterface;
 use MageOS\PageBuilderTemplateImportExport\Api\TemplateManagementInterface;
 use Psr\Log\LoggerInterface;
 

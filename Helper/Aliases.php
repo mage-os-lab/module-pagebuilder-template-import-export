@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace MageOS\PageBuilderTemplateImportExport\Helper;
 
-use Magento\Framework\App\Helper\AbstractHelper;
-
-class Aliases extends AbstractHelper
+class Aliases extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const TEMPLATE_FILE = "template.html";
     const CONFIG_FILE = "config.xml";

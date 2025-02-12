@@ -6,7 +6,7 @@
             <item name="deps" xsi:type="string">pagebuilder_template_import_form.pagebuilder_template_import_data_source</item>
         </item>
         <item name="template" xsi:type="string">templates/form/collapsible</item>
-        <item name="label" xsi:type="string" translate="true">Import Template</item>
+        <item name="label" xsi:type="string" translate="true">Import local template</item>
         <item name="config" xsi:type="array">
             <item name="dataScope" xsi:type="string">data</item>
             <item name="namespace" xsi:type="string">pagebuilder_template_import_form</item>

@@ -17,7 +17,7 @@ class ImportTemplate extends \Symfony\Component\Console\Command\Command
      * @param TemplateManagementInterface $templateManagement
      */
     public function __construct(
-        private readonly TemplateManagementInterface $templateManagement
+        protected TemplateManagementInterface $templateManagement
     ) {
         return parent::__construct();
     }

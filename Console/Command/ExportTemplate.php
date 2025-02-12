@@ -25,8 +25,8 @@ class ExportTemplate extends \Symfony\Component\Console\Command\Command
      * @param TemplateManagementInterface $templateManagement
      */
     public function __construct(
-        private readonly TemplateRepository          $templateRepository,
-        private readonly TemplateManagementInterface $templateManagement
+        protected TemplateRepository          $templateRepository,
+        protected TemplateManagementInterface $templateManagement
     ) {
         parent::__construct();
     }

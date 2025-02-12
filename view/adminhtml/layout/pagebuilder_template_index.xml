@@ -5,10 +5,11 @@
                template="MageOS_PageBuilderTemplateImportExport::import/modal.phtml"
                aclResource="MageOS_PageBuilderTemplateImportExport::pagebuilder_template_import">
             <uiComponent name="pagebuilder_template_import_form"/>
-            <block class="Magento\Backend\Block\Template" name="pagebuilder.template.import.remote-template"
+            <uiComponent name="pagebuilder_remotetemplate_grid"/>
+            <!--<block class="Magento\Backend\Block\Template" name="pagebuilder.template.import.remote-template"
                    template="MageOS_PageBuilderTemplateImportExport::import/remote-template/list.phtml"
                    aclResource="MageOS_PageBuilderTemplateImportExport::pagebuilder_template_import">
-            </block>
+            </block>-->
         </block>
     </referenceContainer>
 </layout>

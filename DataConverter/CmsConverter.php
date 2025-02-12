@@ -20,12 +20,12 @@ class CmsConverter extends SerializedToJson
     /**
      * @var array
      */
-    private $assets = [];
+    protected $assets = [];
 
     /**
      * @var array
      */
-    private $cmsBlocks = [];
+    protected $cmsBlocks = [];
 
     /**
      * @param Normalizer $normalizer
@@ -35,11 +35,11 @@ class CmsConverter extends SerializedToJson
      * @param Serialize $serialize
      */
     public function __construct(
-        private readonly Normalizer $normalizer,
-        private readonly ParameterFactory $parameterFactory,
-        private readonly Json $json,
-        private readonly BlockRepositoryInterface $cmsBlockRepository,
-        Serialize $serialize
+        protected Normalizer $normalizer,
+        protected ParameterFactory $parameterFactory,
+        protected Json $json,
+        protected BlockRepositoryInterface $cmsBlockRepository,
+        protected Serialize $serialize
     ) {
         parent::__construct($serialize, $json);
     }

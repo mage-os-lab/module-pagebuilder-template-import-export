@@ -16,7 +16,7 @@ class UpdateRemoteTemplateList extends \Symfony\Component\Console\Command\Comman
      * @param RemoteStorageManagementInterface $remoteStorageManagement
      */
     public function __construct(
-        private readonly RemoteStorageManagementInterface $remoteStorageManagement
+        protected RemoteStorageManagementInterface $remoteStorageManagement
     ) {
         return parent::__construct();
     }
@@ -36,7 +36,6 @@ class UpdateRemoteTemplateList extends \Symfony\Component\Console\Command\Comman
         try {
             $this->remoteStorageManagement->updateRemoteTemplatesInformations();
         } catch (\Exception $e) {
-            dd($e);
             $output->writeln("An error occurred updating the remote template list");
             return Cli::RETURN_FAILURE;
         }

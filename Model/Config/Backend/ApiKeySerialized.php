@@ -10,7 +10,7 @@ use Magento\Framework\Serialize\Serializer\Json;
 class ApiKeySerialized extends \Magento\Config\Model\Config\Backend\Serialized\ArraySerialized
 {
     public function __construct(
-        protected readonly DropboxClientFactory $dropboxClientFactory,
+        protected DropboxClientFactory $dropboxClientFactory,
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
         \Magento\Framework\App\Config\ScopeConfigInterface $config,
