@@ -58,5 +58,19 @@
             <argument name="logger" xsi:type="object">MageOS\PageBuilderTemplateImportExport\Logger</argument>
         </arguments>
     </type>
-
+    <type name="MageOS\PageBuilderTemplateImportExport\Controller\Adminhtml\Template\Remote\Import">
+        <arguments>
+            <argument name="logger" xsi:type="object">MageOS\PageBuilderTemplateImportExport\Logger</argument>
+        </arguments>
+    </type>
+    <type name="MageOS\PageBuilderTemplateImportExport\Controller\Adminhtml\Template\Export">
+        <arguments>
+            <argument name="logger" xsi:type="object">MageOS\PageBuilderTemplateImportExport\Logger</argument>
+        </arguments>
+    </type>
+    <type name="MageOS\PageBuilderTemplateImportExport\Controller\Adminhtml\Template\Remote\Sync">
+        <arguments>
+            <argument name="logger" xsi:type="object">MageOS\PageBuilderTemplateImportExport\Logger</argument>
+        </arguments>
+    </type>
 </config>

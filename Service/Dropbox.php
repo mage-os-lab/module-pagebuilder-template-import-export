@@ -8,6 +8,7 @@ use MageOS\PageBuilderTemplateImportExport\Service\Dropbox\ClientFactory as Drop
 use MageOS\PageBuilderTemplateImportExport\Service\Dropbox\Client as DropboxClient;
 use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use MageOS\PageBuilderTemplateImportExport\Helper\ModuleConfig;
 
 class Dropbox implements DropboxInterface
 {
@@ -30,6 +31,7 @@ class Dropbox implements DropboxInterface
         protected File $file,
         protected DirectoryList $directoryList,
         protected ConfigCache $cache,
+        protected ModuleConfig $config
     ) {
     }
 
@@ -183,5 +185,27 @@ class Dropbox implements DropboxInterface
             $this->initClient($appKey, $appSecret, $refreshToken);
         }
         return $this->dropbox->getThumbnail($path, $format, $size);
+    }
+
+    /**
+     * @param string $signature
+     * @param string $requestBody
+     * @return bool
+     */
+    public function verifyWebhook(string $signature, string $requestBody): bool
+    {
+        foreach ($this->config->getDropboxCredentials() as $credential) {
+            $computedSignature = hash_hmac(
+                'sha256',
+                $requestBody,
+                $credential["app_secret"],
+                true
+            );
+            $computedSignature = base64_encode($computedSignature);
+            if (hash_equals($computedSignature, $signature)) {
+                return $credential["app_key"];
+            }
+        }
+        return false;
     }
 }
