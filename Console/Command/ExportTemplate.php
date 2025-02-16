@@ -65,7 +65,7 @@ class ExportTemplate extends \Symfony\Component\Console\Command\Command
                 'Description template tag (used for remote templates only)'
             ),
         ];
-        $this->setName('pagebuilder:template:export');
+        $this->setName('mage-os:pagebuilder_template:export');
         $this->setDefinition($options);
         $this->setDescription('Export PageBuilder Template.');
     }

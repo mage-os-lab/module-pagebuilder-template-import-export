@@ -32,7 +32,7 @@ class ImportTemplate extends \Symfony\Component\Console\Command\Command
                 'Template import file path'
             )
         ];
-        $this->setName('pagebuilder:template:import');
+        $this->setName('mage-os:pagebuilder_template:import');
         $this->setDefinition($options);
         $this->setDescription('Import PageBuilder Template.');
     }

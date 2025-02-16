@@ -55,22 +55,24 @@ class RemoteTemplateRepository implements RemoteTemplateRepositoryInterface
     }
 
     /**
-     * @param string $templateId
+     * @param string $templateName
      * @param string $remoteStorageId
      * @return RemoteTemplateInterface
      * @throws NoSuchEntityException
      */
-    public function getByTemplateAndStorageId(string $templateId, string $remoteStorageId): RemoteTemplateInterface
-    {
+    public function getByTemplateNameAndStorageId(
+        string $templateName,
+        string $remoteStorageId
+    ): RemoteTemplateInterface {
         $searchCriteria = $this->searchCriteriaBuilderFactory->create()
-            ->addFilter('template_id', $templateId)
+            ->addFilter('template_name', $templateName)
             ->addFilter('remote_storage_id', $remoteStorageId)
             ->create();
 
         $templateList = $this->getList($searchCriteria);
         if ($templateList->getTotalCount() === 0) {
             throw new NoSuchEntityException(
-                __('Entity with template ID "%1" and storage ID "%2" not found.', $templateId, $remoteStorageId)
+                __('Entity with template name "%1" and storage ID "%2" not found.', $templateName, $remoteStorageId)
             );
         }
         $templateListResult = $templateList->getItems();

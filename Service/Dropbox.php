@@ -166,6 +166,44 @@ class Dropbox implements DropboxInterface
 
     /**
      * @param string $path
+     * @param string $appKey
+     * @param string $appSecret
+     * @param string $refreshToken
+     * @return array
+     */
+    public function getMetadata(
+        string $path = "",
+        string $appKey = "",
+        string $appSecret = "",
+        string $refreshToken = ""
+    ): array {
+        if (empty($this->dropbox) || $appKey !== "") {
+            $this->initClient($appKey, $appSecret, $refreshToken);
+        }
+        return $this->dropbox->getMetadata($path);
+    }
+
+    /**
+     * @param string $cursor
+     * @param string $appKey
+     * @param string $appSecret
+     * @param string $refreshToken
+     * @return array
+     */
+    public function listFolderContinue(
+        string $cursor = "",
+        string $appKey = "",
+        string $appSecret = "",
+        string $refreshToken = ""
+    ): array {
+        if (empty($this->dropbox) || $appKey !== "") {
+            $this->initClient($appKey, $appSecret, $refreshToken);
+        }
+        return $this->dropbox->listFolderContinue($cursor);
+    }
+
+    /**
+     * @param string $path
      * @param string $format
      * @param string $size
      * @param string $appKey
@@ -188,22 +226,46 @@ class Dropbox implements DropboxInterface
     }
 
     /**
+     * @param array $options
+     * @param string $appKey
+     * @param string $appSecret
+     * @param string $refreshToken
+     * @return array
+     * @throws \Exception
+     */
+    public function getLatestCursor(
+        array $options = [],
+        string $appKey = "",
+        string $appSecret = "",
+        string $refreshToken = ""
+    ):array {
+        if (empty($this->dropbox) || $appKey !== "") {
+            $this->initClient($appKey, $appSecret, $refreshToken);
+        }
+        $parameters = [
+            "include_deleted" => $options["include_deleted"] ?? false,
+            "include_has_explicit_shared_members" => $options["include_has_explicit_shared_members"] ?? false,
+            "include_media_info" => $options["include_media_info"] ?? false,
+            "include_mounted_folders" => $options["include_mounted_folders"] ?? false,
+            "include_non_downloadable_files" => $options["include_non_downloadable_files"] ?? false,
+            "path" => $options["path"] ?? "",
+            "recursive" => $options["recursive"] ?? false
+        ];
+        return $this->dropbox->rpcEndpointRequest('files/list_folder/get_latest_cursor', $parameters);
+    }
+
+    /**
      * @param string $signature
      * @param string $requestBody
-     * @return bool
+     * @return mixed
      */
-    public function verifyWebhook(string $signature, string $requestBody): bool
+    public function verifyWebhook(string $signature, string $requestBody): mixed
     {
+        $requestBody = file_get_contents("php://input");
         foreach ($this->config->getDropboxCredentials() as $credential) {
-            $computedSignature = hash_hmac(
-                'sha256',
-                $requestBody,
-                $credential["app_secret"],
-                true
-            );
-            $computedSignature = base64_encode($computedSignature);
+            $computedSignature = hash_hmac('sha256', $requestBody, $credential["app_secret"]);
             if (hash_equals($computedSignature, $signature)) {
-                return $credential["app_key"];
+                return $credential;
             }
         }
         return false;

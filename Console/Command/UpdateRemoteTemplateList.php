@@ -23,7 +23,7 @@ class UpdateRemoteTemplateList extends \Symfony\Component\Console\Command\Comman
 
     protected function configure()
     {
-        $this->setName('pagebuilder:template:update-remote-list');
+        $this->setName('mage-os:pagebuilder_template:update-remote-list');
         $this->setDescription('Update PageBuilder remote template list.');
     }
 
@@ -34,9 +34,9 @@ class UpdateRemoteTemplateList extends \Symfony\Component\Console\Command\Comman
     {
         $output->setDecorated(true);
         try {
-            $this->remoteStorageManagement->updateRemoteTemplatesInformations();
+            $this->remoteStorageManagement->updateRemoteTemplatesInformations(true);
         } catch (\Exception $e) {
-            $output->writeln("An error occurred updating the remote template list");
+            $output->writeln("An error occurred updating the remote template list: " . $e->getMessage());
             return Cli::RETURN_FAILURE;
         }
         return Cli::RETURN_SUCCESS;

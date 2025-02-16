@@ -10,9 +10,10 @@ interface RemoteStorageManagementInterface
 {
 
     /**
+     * @param bool $fullSync
      * @return void
      */
-    public function updateRemoteTemplatesInformations(): void;
+    public function updateRemoteTemplatesInformations(bool $fullSync = false): void;
 
     /**
      * @return RemoteTemplateInterface[]

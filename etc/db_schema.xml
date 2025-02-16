@@ -12,8 +12,26 @@
             <column name="entity_id"/>
         </constraint>
         <constraint xsi:type="unique" referenceId="REMOTE_PAGEBUILDER_TEMPLATE_UNIQUE">
-            <column name="template_id"/>
+            <column name="template_name"/>
             <column name="remote_storage_id"/>
+        </constraint>
+        <index referenceId="REMOTE_PAGEBUILDER_TEMPLATE_STORAGE_ID_TEMPLATE_ID_REMOTE_STORAGE_ID_LAST_UPDATE" indexType="btree">
+            <column name="entity_id"/>
+            <column name="template_id"/>
+            <column name="template_name"/>
+            <column name="remote_storage_id"/>
+            <column name="last_update"/>
+        </index>
+    </table>
+    <table name="remote_pagebuilder_template_cursor" resource="default" engine="innodb" comment="Remote Pagebuilder Template Cursor">
+        <column name="entity_id" xsi:type="int" nullable="false" identity="true" unsigned="true" comment="Entity ID"/>
+        <column name="storage_id" xsi:type="varchar" nullable="false" comment="Storage ID"/>
+        <column name="latest_cursor" xsi:type="varchar" length="255" nullable="false" comment="Storage Latest Cursor"/>
+        <constraint xsi:type="primary" referenceId="REMOTE_PAGEBUILDER_TEMPLATE_CURSOR_ENTITY_ID">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="REMOTE_PAGEBUILDER_TEMPLATE_CURSOR_UNIQUE">
+            <column name="storage_id"/>
         </constraint>
     </table>
 </schema>

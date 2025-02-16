@@ -11,6 +11,16 @@
         "spatie/dropbox-api": "^1.22",
         "ext-zip": "*"
     },
+    "authors": [
+        {
+            "name": "Samuele Martini",
+            "email": "samuele.rw@gmail.com"
+        },
+        {
+            "name": "Davide Lunardon",
+            "email": "dadolun@gmail.com"
+        }
+    ],
     "require-dev": {
         "phpunit/phpunit": "^9.5"
     },

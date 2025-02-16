@@ -5,6 +5,7 @@ namespace MageOS\PageBuilderTemplateImportExport\Ui\Component\Listing;
 
 use Magento\Framework\AuthorizationInterface;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
+use MageOS\PageBuilderTemplateImportExport\Helper\ModuleConfig;
 
 class ImportTemplateButton implements ButtonProviderInterface
 {
@@ -16,7 +17,8 @@ class ImportTemplateButton implements ButtonProviderInterface
      * @param AuthorizationInterface $authorization
      */
     public function __construct(
-        protected AuthorizationInterface $authorization
+        protected AuthorizationInterface $authorization,
+        protected ModuleConfig $moduleConfig
     ) {
     }
 
@@ -25,7 +27,7 @@ class ImportTemplateButton implements ButtonProviderInterface
      */
     public function getButtonData()
     {
-        if (!$this->isAllowed()) {
+        if (!$this->isAllowed() || !$this->moduleConfig->isEnabled()) {
             return [];
         }
 

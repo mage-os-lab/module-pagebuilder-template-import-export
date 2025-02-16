@@ -11,7 +11,23 @@
         },
         "constraint": {
             "PRIMARY": true,
-            "REMOTE_PAGEBUILDER_TEMPLATE_TEMPLATE_ID_REMOTE_STORAGE_ID": true
+            "REMOTE_PAGEBUILDER_TEMPLATE_TEMPLATE_ID_REMOTE_STORAGE_ID": true,
+            "REMOTE_PAGEBUILDER_TEMPLATE_TEMPLATE_NAME_REMOTE_STORAGE_ID": true
+        },
+        "index": {
+            "IDX_357D26297B6645B0DFF8391DC1D5D6DF": true,
+            "IDX_4D32AC282CDDB6884BCA632550B18000": true
+        }
+    },
+    "remote_pagebuilder_template_cursor": {
+        "column": {
+            "entity_id": true,
+            "storage_id": true,
+            "latest_cursor": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "REMOTE_PAGEBUILDER_TEMPLATE_CURSOR_STORAGE_ID": true
         }
     }
 }

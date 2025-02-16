@@ -4,6 +4,8 @@
     <preference for="MageOS\PageBuilderTemplateImportExport\Api\RemoteStorageManagementInterface" type="MageOS\PageBuilderTemplateImportExport\Model\RemoteStorageManagement"/>
     <preference for="MageOS\PageBuilderTemplateImportExport\Api\Data\RemoteTemplateInterface" type="MageOS\PageBuilderTemplateImportExport\Model\RemoteTemplate"/>
     <preference for="MageOS\PageBuilderTemplateImportExport\Api\RemoteTemplateRepositoryInterface" type="MageOS\PageBuilderTemplateImportExport\Model\RemoteTemplateRepository"/>
+    <preference for="MageOS\PageBuilderTemplateImportExport\Api\Data\RemoteCursorInterface" type="MageOS\PageBuilderTemplateImportExport\Model\RemoteCursor"/>
+    <preference for="MageOS\PageBuilderTemplateImportExport\Api\RemoteCursorRepositoryInterface" type="MageOS\PageBuilderTemplateImportExport\Model\RemoteCursorRepository"/>
     <preference for="MageOS\PageBuilderTemplateImportExport\Api\DropboxInterface" type="MageOS\PageBuilderTemplateImportExport\Service\Dropbox"/>
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>

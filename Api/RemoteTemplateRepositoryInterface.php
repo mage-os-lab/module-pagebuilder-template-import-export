@@ -27,12 +27,15 @@ interface RemoteTemplateRepositoryInterface
     public function getById(int $id): RemoteTemplateInterface;
 
     /**
-     * @param string $templateId
+     * @param string $templateName
      * @param string $remoteStorageId
      * @return RemoteTemplateInterface
      * @throws NoSuchEntityException
      */
-    public function getByTemplateAndStorageId(string $templateId, string $remoteStorageId): RemoteTemplateInterface;
+    public function getByTemplateNameAndStorageId(
+        string $templateName,
+        string $remoteStorageId
+    ): RemoteTemplateInterface;
 
     /**
      * @param RemoteTemplateInterface $template

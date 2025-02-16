@@ -62,7 +62,7 @@ class Import extends Action implements HttpPostActionInterface
                 ->getAbsolutePath();
             $tmpTemplateDownloadPath = $importExportPath . '/tmp-template.zip';
             $this->dropbox->downloadZip(
-                $remoteTemplate->getData("template_id"),
+                $remoteTemplate->getData("file_path"),
                 $tmpTemplateDownloadPath,
                 $credentials["app_key"],
                 $credentials["app_secret"],
@@ -77,7 +77,9 @@ class Import extends Action implements HttpPostActionInterface
             }
         } catch (\Exception $e) {
             $this->logger->error($e);
-            $this->messageManager->addErrorMessage($e->getMessage());
+            $this->messageManager->addErrorMessage(
+                __("An error occurred downloading the selected template. Check the logs or try again later.")
+            );
             return $resultRedirect->setPath('pagebuilder/template/index');
         }
         return $resultRedirect->setPath('pagebuilder/template/index');

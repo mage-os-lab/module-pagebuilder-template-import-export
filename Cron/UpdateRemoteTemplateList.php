@@ -23,6 +23,7 @@ class UpdateRemoteTemplateList
     public function execute()
     {
         try {
+            $this->logger->info('Cron: Start remote templates information update.');
             $this->remoteStorageManagement->updateRemoteTemplatesInformations();
             $this->logger->info('Cron: Remote templates information updated successfully.');
         } catch (\Exception $e) {
