@@ -69,6 +69,7 @@ Follow these instructions:
 - Click on "Regenerate refresh token" and follow the instructions to generate the one-time valid "access code"
 - Paste "access code" inside the input below the "Regenerate refresh token" button
 - Save the configuration clicking on the main configuration "Save" button
+
 If no errors where encountered during the saving process you'll be able to see a refresh token generated on the fourth column of the row you configured previously.
 Congratulations! This token will be used for each dropbox api call to the related app storage.
 This configuration is managed as multi-row so you can add multiple dropbox apps related to different repositories simultaneously.
@@ -85,6 +86,7 @@ Remember to apply the right permissions (following permissions are required):
 - files.content.read
 - file_requests.write
 - file_requests.read
+
 Then add your site webhook endpoint inside "Webhook URIs" section:
 https://ww.mysite.com/pagebuildertemplateie/template_remote/sync
 Here you go, copy the app_key and app_secret and save use them on your Magento configurations.
