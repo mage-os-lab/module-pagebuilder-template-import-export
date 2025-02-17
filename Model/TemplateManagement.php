@@ -103,14 +103,21 @@ class TemplateManagement implements TemplateManagementInterface
         foreach ($iterator as $entity) {
             try {
                 if ($entity->isDir()) {
+                    $fileName = $entity->getFilename();
+                    if (substr($fileName, -1) !== "/") {
+                        $fileName = $fileName . "/";
+                    }
                     $exceptionMessages = array_merge(
                         $exceptionMessages,
                         $this->copyAssetsFilesToMediaDirectory(
                             $entity->getPathname(),
-                            $destinationPath . $entity->getFilename()
+                            $destinationPath . $fileName
                         )
                     );
                 } else {
+                    if (substr($destinationPath, -1) !== "/") {
+                        $destinationPath = $destinationPath . "/";
+                    }
                     $this->fileDriver->copy($entity->getPathname(), $destinationPath . $entity->getFilename());
                 }
             } catch (FileSystemException $exception) {
@@ -156,6 +163,9 @@ class TemplateManagement implements TemplateManagementInterface
                 ->getDirectoryWrite(DirectoryList::MEDIA);
             $directory = $mediaDirWrite->getAbsolutePath('.template-manager');
             $mediaDirWrite->create($directory);
+            if (substr($fileName, 0, 1) !== "/") {
+                $fileName = "/" . $fileName;
+            }
             $fileAbsolutePath = $directory . $fileName;
             // Write the file to the directory
             $mediaDirWrite->getDriver()->filePutContents($fileAbsolutePath, $decodedImage);
@@ -385,6 +395,9 @@ class TemplateManagement implements TemplateManagementInterface
         $tmpFolder = $reader->getAbsolutePath() . "tmp";
         $zip->extractTo($tmpFolder);
         $zip->close();
+        if (substr($filePath, 0, 1) !== "/") {
+            $filePath = "/" . $filePath;
+        }
         $templateHtmlContent = $reader->readFile($tmpFolder . $filePath . "/" . TemplateAliasHelper::TEMPLATE_FILE);
 
         $baseUrl = trim($this->storeManager->getStore()->getBaseUrl(), "/");
