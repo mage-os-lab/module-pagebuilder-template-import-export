@@ -80,12 +80,8 @@ If you want to your own dropbox repository and store you templates there you nee
 In order to connect Magento with dropbox you need to create a dropbox app related to it: https://www.dropbox.com/developers/reference/getting-started
 You can create the app from there: https://www.dropbox.com/developers/apps?_tk=pilot_lp&_ad=topbar4&_camp=myapps
 Remember to apply the right permissions (following permissions are required):
-- files.metadata.write
 - files.metadata.read
-- files.content.write
 - files.content.read
-- file_requests.write
-- file_requests.read
 
 Then add your site webhook endpoint inside "Webhook URIs" section:
 https://ww.mysite.com/pagebuildertemplateie/template_remote/sync
