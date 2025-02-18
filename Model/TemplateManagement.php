@@ -19,6 +19,7 @@ use Magento\Framework\Data\Wysiwyg\Normalizer;
 use MageOS\PageBuilderTemplateImportExport\Helper\Aliases as TemplateAliasHelper;
 use Magento\PageBuilder\Model\TemplateRepository;
 use MageOS\PageBuilderTemplateImportExport\DataConverter\CmsConverter;
+use Magento\Framework\Filesystem\Io\File as IoFile;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Driver\File as FileDriver;
 use Magento\Framework\Api\ImageContentFactory;
@@ -41,6 +42,7 @@ class TemplateManagement implements TemplateManagementInterface
      * @param CmsConverter $cmsConverter
      * @param Filesystem $filesystem
      * @param File $fileDriver
+     * @param IoFile $ioFile
      * @param StoreManagerInterface $storeManager
      * @param TemplateRepository $templateRepository
      * @param TemplateFactory $templateFactory
@@ -61,6 +63,7 @@ class TemplateManagement implements TemplateManagementInterface
         protected CmsConverter $cmsConverter,
         protected Filesystem $filesystem,
         protected FileDriver $fileDriver,
+        protected IoFile $ioFile,
         protected StoreManagerInterface $storeManager,
         protected TemplateRepository $templateRepository,
         protected TemplateFactory $templateFactory,
@@ -107,6 +110,7 @@ class TemplateManagement implements TemplateManagementInterface
                     if (substr($fileName, -1) !== "/") {
                         $fileName = $fileName . "/";
                     }
+                    $this->ioFile->checkAndCreateFolder($destinationPath . $fileName);
                     $exceptionMessages = array_merge(
                         $exceptionMessages,
                         $this->copyAssetsFilesToMediaDirectory(
