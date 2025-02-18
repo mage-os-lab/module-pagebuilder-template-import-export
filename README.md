@@ -4,10 +4,12 @@ Enrich PageBuilder adding templates import/export management.
 
 ---
 
+
 ## Overview
 
 The **PageBuilder Templates Import/Export** module allows you to import and export pagebuilder templates through different magento instances.
 You can use it exporting zip templates file locally and move to remote instances or pulling directly from a configured dropbox storage.
+
 
 ## Features
 
@@ -20,6 +22,7 @@ php bin/magento mage-os:pagebuilder_template:export
 ```
 As result of export you will obtain a .zip file containing the template.
 
+
 ### Import Template
 
 You can import templates from adminhtml ui always from the "Content > Elements > Templates" section.
@@ -28,6 +31,7 @@ Cli command is also supported for import:
 ```
 php bin/magento mage-os:pagebuilder_template:import
 ```
+
 
 ### Remote Template Import
 
@@ -51,14 +55,17 @@ php bin/magento mage-os:pagebuilder_template:update-remote-list
     bin/magento setup:upgrade
     ```
 
+
 ## Configuration
 
 The module provides configuration options under **Stores > Configuration > MageOS > Pagebuilder template import/export**
+
 
 #### General Configuration
 
 - **Enable**: Enables or disables the module. This setting is configurable on global scope.
 - **Dropbox repositories**: Allows you to specify the Dropbox apps from which to receive templates.
+
 
 #### Dropbox repositories Configuration
 
@@ -74,26 +81,34 @@ If no errors where encountered during the saving process you'll be able to see a
 Congratulations! This token will be used for each dropbox api call to the related app storage.
 This configuration is managed as multi-row so you can add multiple dropbox apps related to different repositories simultaneously.
 
+
+#### Dropbox app Creation
+
+In order to connect Magento with dropbox you need to create a dropbox app related to it: https://www.dropbox.com/developers/reference/getting-started
+If you're configuring your own dropbox application for your Dropbox Account you must follow these steps:
+1) Select "Scoped Access" on "Choose an API" section
+2) Select "Full Dropbox" on "Choose the type of access you need" section
+3) Add an app name ex: "My Mage-OS Template Storage"
+ 
+
 #### Dropbox app Configuration
 
-If you want to your own dropbox repository and store you templates there you need to open a dropbox account first.
-In order to connect Magento with dropbox you need to create a dropbox app related to it: https://www.dropbox.com/developers/reference/getting-started
-You can create the app from there: https://www.dropbox.com/developers/apps?_tk=pilot_lp&_ad=topbar4&_camp=myapps
-Remember to apply the right permissions (following permissions are required):
-- files.metadata.write
+The most important thing is setting the right permissions (following permissions are required):
 - files.metadata.read
-- files.content.write
 - files.content.read
-- file_requests.write
-- file_requests.read
 
-Then add your site webhook endpoint inside "Webhook URIs" section:
+If you are the owner on Dropbox space and you can manage the app directly you can also configure webhooks for realtime notification and sync.
+To do so, add your site webhook endpoint inside "Webhook URIs" section as follows:
 https://ww.mysite.com/pagebuildertemplateie/template_remote/sync
-Here you go, copy the app_key and app_secret and save use them on your Magento configurations.
+If correct your Magento instance will be updated realtime for any update on your Dropbox.
+
+If you're not the owner of the Dropbox you must ask for webhook update to the owner.
+
 
 ## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+
 
 ## License
 
