@@ -100,7 +100,8 @@ The most important thing is setting the right permissions (following permissions
 If you are the owner on Dropbox space and you can manage the app directly you can also configure webhooks for realtime notification and sync.
 To do so, add your site webhook endpoint inside "Webhook URIs" section as follows:
 https://ww.mysite.com/pagebuildertemplateie/template_remote/sync
-If correct your Magento instance will be updated realtime for any update on your Dropbox.
+
+If correct, your Magento instance will be updated realtime for any update on your Dropbox.
 
 If you're not the owner of the Dropbox you must ask for webhook update to the owner.
 
