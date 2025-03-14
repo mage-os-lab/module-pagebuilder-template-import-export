@@ -5,6 +5,8 @@ namespace MageOS\PageBuilderTemplateImportExport\Model;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
+use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\SerializerInterface;
 use MageOS\PageBuilderTemplateImportExport\Api\Data\RemoteTemplateInterface;
@@ -52,8 +54,8 @@ class RemoteStorageManagement implements RemoteStorageManagementInterface
      * @param array $credentials
      * @return void
      * @throws NoSuchEntityException
-     * @throws \Magento\Framework\Exception\CouldNotDeleteException
-     * @throws \Magento\Framework\Exception\CouldNotSaveException
+     * @throws CouldNotDeleteException
+     * @throws CouldNotSaveException
      */
     public function updateRemoteTemplatesInformations($fullSync = false, array $credentials = []): void
     {
@@ -169,6 +171,21 @@ class RemoteStorageManagement implements RemoteStorageManagementInterface
                 $remoteTemplate->setId($template["entity_id"]);
             }
             $this->remoteTemplateRepository->save($remoteTemplate);
+        }
+    }
+
+    /**
+     * @param array $credentials
+     * @return void
+     * @throws CouldNotDeleteException
+     */
+    public function deleteRemoteTemplates(array $credentials): void
+    {
+        $searchCriteria = $this->searchCriteriaBuilderFactory->create()
+            ->addFilter('remote_storage_id', $credentials["app_key"])
+            ->create();
+        foreach ($this->remoteTemplateRepository->getList($searchCriteria)->getItems() as $remoteTemplate) {
+            $this->remoteTemplateRepository->delete($remoteTemplate);
         }
     }
 

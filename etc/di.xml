@@ -42,6 +42,16 @@
         </arguments>
     </type>
 
+    <!-- QUEUE RUNNER -->
+    <type name="Magento\Framework\MessageQueue\ConsumerConfigurationInterface">
+        <arguments>
+            <argument name="consumerNames" xsi:type="array">
+                <item name="pagebuildertemplateie.credential.create.consumer" xsi:type="string">pagebuildertemplateie.credential.create.consumer</item>
+                <item name="pagebuildertemplateie.credential.delete.consumer" xsi:type="string">pagebuildertemplateie.credential.delete.consumer</item>
+            </argument>
+        </arguments>
+    </type>
+
     <!-- CUSTOM LOGGER -->
     <virtualType name="MageOS\PageBuilderTemplateImportExport\LoggerHanlder" type="Magento\Framework\Logger\Handler\Base">
         <arguments>

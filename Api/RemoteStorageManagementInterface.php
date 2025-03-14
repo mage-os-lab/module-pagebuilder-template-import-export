@@ -11,9 +11,16 @@ interface RemoteStorageManagementInterface
 
     /**
      * @param bool $fullSync
+     * @param array $credentials
      * @return void
      */
-    public function updateRemoteTemplatesInformations(bool $fullSync = false): void;
+    public function updateRemoteTemplatesInformations(bool $fullSync = false, array $credentials = []): void;
+
+    /**
+     * @param array $credentials
+     * @return void
+     */
+    public function deleteRemoteTemplates(array $credentials): void;
 
     /**
      * @return RemoteTemplateInterface[]

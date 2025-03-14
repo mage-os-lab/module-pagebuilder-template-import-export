@@ -10,16 +10,20 @@ use MageOS\PageBuilderTemplateImportExport\Service\Dropbox as DropboxService;
 use MageOS\PageBuilderTemplateImportExport\Api\Data\RemoteCursorInterfaceFactory;
 use MageOS\PageBuilderTemplateImportExport\Api\RemoteCursorRepositoryInterface;
 use MageOS\PageBuilderTemplateImportExport\Api\RemoteStorageManagementInterface;
+use Magento\Framework\MessageQueue\PublisherInterface;
 use Magento\Framework\Serialize\Serializer\Json;
 
 class ApiKeySerialized extends \Magento\Config\Model\Config\Backend\Serialized\ArraySerialized
 {
+
     public function __construct(
         protected DropboxClientFactory $dropboxClientFactory,
         protected DropboxService $dropboxService,
         protected RemoteCursorRepositoryInterface $remoteCursorRepository,
         protected RemoteCursorInterfaceFactory $remoteCursorInterfaceFactory,
         protected RemoteStorageManagementInterface $remoteStorageManagement,
+        protected PublisherInterface $messagePublisher,
+        protected Json $jsonSerializer,
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
         \Magento\Framework\App\Config\ScopeConfigInterface $config,
@@ -88,5 +92,23 @@ class ApiKeySerialized extends \Magento\Config\Model\Config\Backend\Serialized\A
         }
         $this->setValue($values);
         return parent::beforeSave();
+    }
+
+    public function afterSave()
+    {
+        $oldValue = $this->getOldValue();
+        $newValue = $this->getValue();
+
+        $oldValue = $this->jsonSerializer->unserialize($oldValue);
+        $newValue = $this->jsonSerializer->unserialize($newValue);
+        $keyDiff = [];
+        if (is_array($newValue) && is_array($oldValue)) {
+            $keyDiff = array_diff_key($oldValue, $newValue);
+        }
+
+        foreach ($keyDiff as $key) {
+            $this->remoteStorageManagement->deleteRemoteTemplates($key);
+        }
+        return parent::afterSave();
     }
 }
