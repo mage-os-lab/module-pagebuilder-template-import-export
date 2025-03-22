@@ -64,6 +64,7 @@ class RemoteStorageManagement implements RemoteStorageManagementInterface
         } else {
             $dropboxCredentials = [$credentials];
         }
+
         $templates = [];
         foreach ($dropboxCredentials as $credentials) {
             $remoteTemplatesCount = 0;

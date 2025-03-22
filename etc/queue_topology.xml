@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/topology.xsd">
+    <exchange name="magento" connection="db" type="topic">
+        <binding id="pbTemplateImportBinding" destinationType="queue" topic="pbtemplate.import" destination="pbtemplate"/>
+    </exchange>
+</config>

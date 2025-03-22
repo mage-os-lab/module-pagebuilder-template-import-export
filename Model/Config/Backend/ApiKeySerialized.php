@@ -10,6 +10,7 @@ use MageOS\PageBuilderTemplateImportExport\Service\Dropbox as DropboxService;
 use MageOS\PageBuilderTemplateImportExport\Api\Data\RemoteCursorInterfaceFactory;
 use MageOS\PageBuilderTemplateImportExport\Api\RemoteCursorRepositoryInterface;
 use MageOS\PageBuilderTemplateImportExport\Api\RemoteStorageManagementInterface;
+use MageOS\PageBuilderTemplateImportExport\Helper\ModuleConfig;
 use Magento\Framework\MessageQueue\PublisherInterface;
 use Magento\Framework\Serialize\Serializer\Json;
 
@@ -22,8 +23,9 @@ class ApiKeySerialized extends \Magento\Config\Model\Config\Backend\Serialized\A
         protected RemoteCursorRepositoryInterface $remoteCursorRepository,
         protected RemoteCursorInterfaceFactory $remoteCursorInterfaceFactory,
         protected RemoteStorageManagementInterface $remoteStorageManagement,
-        protected PublisherInterface $messagePublisher,
         protected Json $jsonSerializer,
+        protected ModuleConfig $moduleConfig,
+        protected PublisherInterface $messagePublisher,
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
         \Magento\Framework\App\Config\ScopeConfigInterface $config,
@@ -70,24 +72,29 @@ class ApiKeySerialized extends \Magento\Config\Model\Config\Backend\Serialized\A
 
                 try {
                     $remoteCursor = $this->remoteCursorRepository->getByStorageId($row["app_key"]);
+                    $latestCursor = $this->dropboxService->getLatestCursor(
+                        [],
+                        $row["app_key"],
+                        $row["app_secret"],
+                        $authData['refresh_token']
+                    );
+                    if (isset($latestCursor["cursor"])) {
+                        $remoteCursor->setData(
+                            "latest_cursor",
+                            $latestCursor["cursor"]
+                        );
+                    }
                 } catch (NoSuchEntityException $e) {
                     $remoteCursor = $this->remoteCursorInterfaceFactory->create();
                     $remoteCursor->setData("storage_id", $row["app_key"]);
                 }
-                $latestCursor = $this->dropboxService->getLatestCursor(
-                    [],
-                    $row["app_key"],
-                    $row["app_secret"],
-                    $authData['refresh_token']
-                );
-                if (isset($latestCursor["cursor"])) {
-                    $remoteCursor->setData(
-                        "latest_cursor",
-                        $latestCursor["cursor"]
-                    );
-                }
                 $this->remoteCursorRepository->save($remoteCursor);
-                $this->remoteStorageManagement->updateRemoteTemplatesInformations(true, $values[$key]);
+
+                if ($this->moduleConfig->isQueueManagementEnabled()) {
+                    $this->messagePublisher->publish('pbtemplate.import', $values[$key]);
+                } else {
+                    $this->remoteStorageManagement->updateRemoteTemplatesInformations(true, $values[$key]);
+                }
             }
         }
         $this->setValue($values);

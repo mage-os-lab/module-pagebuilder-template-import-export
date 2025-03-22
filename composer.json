@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.1",
         "magento/module-page-builder": "*",
+        "mage-os/mageos-async-events": "*",
         "spatie/dropbox-api": "^1.22",
         "ext-zip": "*"
     },

@@ -17,6 +17,12 @@
                     <label>Enable</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="synch_templates_by_cron" translate="label,comment" type="select" sortOrder="10"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Synch remote templates by cron</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Synchronize remote templates from dropbox by cron (suggested for large number of templates on stored remotely).<br/>Be sure to have "pbTemplateImport" on your env.php consumer list (See module documentation).<br/><strong>Remember to update and save this config before new credentials creation.</strong>]]></comment>
+                </field>
                 <field id="dropbox_credentials" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="20" translate="label,comment">
                     <label>Dropbox repositories</label>
                     <comment><![CDATA[Add valid App key/App secret credentials.<br/>After that generate the refresh token clicking on "Regenerate refresh token", print access token on the input and save config. Refresh Token for the dropbox app will be generated automatically..]]></comment>

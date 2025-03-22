@@ -8,7 +8,6 @@ use MageOS\PageBuilderTemplateImportExport\Api\Data\RemoteTemplateInterface;
 
 interface RemoteStorageManagementInterface
 {
-
     /**
      * @param bool $fullSync
      * @param array $credentials

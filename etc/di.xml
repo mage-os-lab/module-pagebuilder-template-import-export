@@ -85,4 +85,9 @@
             <argument name="logger" xsi:type="object">MageOS\PageBuilderTemplateImportExport\Logger</argument>
         </arguments>
     </type>
+    <type name="MageOS\PageBuilderTemplateImportExport\Model\TemplateTriggerHandler">
+        <arguments>
+            <argument name="logger" xsi:type="object">MageOS\PageBuilderTemplateImportExport\Logger</argument>
+        </arguments>
+    </type>
 </config>
