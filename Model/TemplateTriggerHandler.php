@@ -25,7 +25,7 @@ class TemplateTriggerHandler
     {
         try {
             $credentials = array_combine(
-                ['app_key', 'app_secret', 'refresh_token'],
+                ['name', 'app_key', 'app_secret', 'refresh_token'],
                 array_values($credentials)
             );
             $this->remoteStorageManagement->updateRemoteTemplatesInformations(true, $credentials);
