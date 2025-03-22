@@ -21,7 +21,7 @@ class DropboxAppCredentials extends AbstractFieldArray
         $this->addColumn(
             'access_code',
             [
-                'label' => __('Access Code'),
+                'label' => __('Refresh Token Generator'),
                 'renderer' => $this->_data['AccessCodeRenderer']
             ]
         );

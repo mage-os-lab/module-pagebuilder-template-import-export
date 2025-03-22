@@ -1,10 +1,10 @@
 <div id="row<?= $this->getInputId(); ?>">
     <div id="<?= $this->getInputId(); ?>_anchor" style="display: none;"
          class="action-default ui-button">
-        <?= __("Regenerate refresh token"); ?>
+        <?= __("Generate and authorize refresh token"); ?>
     </div>
     <input id="<?= $this->getInputId(); ?>" type="text" name="<?= $this->getInputName(); ?>" value="" />
-    <p><?= __("Insert the generated access code over there."); ?></p>
+    <small><?= __("Insert the generated access code for your own dropbox account over there."); ?></small>
 </div>
 <script type="text/javascript">
     (function($) {

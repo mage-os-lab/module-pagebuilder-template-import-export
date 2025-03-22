@@ -25,7 +25,7 @@
                 </field>
                 <field id="dropbox_credentials" showInDefault="1" showInWebsite="0" showInStore="0" sortOrder="20" translate="label,comment">
                     <label>Dropbox repositories</label>
-                    <comment><![CDATA[Add valid App key/App secret credentials.<br/>After that generate the refresh token clicking on "Regenerate refresh token", print access token on the input and save config. Refresh Token for the dropbox app will be generated automatically..]]></comment>
+                    <comment><![CDATA[<strong class="label">Add valid App key/App secret/App refresh token credentials provided from the Dropbox owner.</strong><br/>If you're the owner of the dropbox account you can generate the refresh token directly from the "Refresh Token Generator" section.<br/> To generate a refresh token click on "Generate and authorize refresh token", print the access token on the input and save the config.<br/> Refresh Token for the dropbox app will be generated automatically.]]></comment>
                     <frontend_model>MageOS\PageBuilderTemplateImportExport\Block\Adminhtml\Form\Field\DropboxAppCredentials</frontend_model>
                     <backend_model>MageOS\PageBuilderTemplateImportExport\Model\Config\Backend\ApiKeySerialized</backend_model>
                     <depends>

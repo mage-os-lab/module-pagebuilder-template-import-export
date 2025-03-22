@@ -93,16 +93,23 @@ The module provides configuration options under **Stores > Configuration > MageO
 
 #### Dropbox repositories Configuration
 
-To synchronize remote templates stored on a dropbox repository you need to add a dropbox app.
+To synchronize remote templates stored on a dropbox repository owned by a vendor you need to add a dropbox app.
 Follow these instructions:
+- Specify a name
 - Specify the app_key
 - Specify the app_secret (see https://www.dropbox.com/developers/apps or get them from the dropbox app owner)
-- Click on "Regenerate refresh token" and follow the instructions to generate the one-time valid "access code"
-- Paste "access code" inside the input below the "Regenerate refresh token" button
-- Save the configuration clicking on the main configuration "Save" button
+- Specify the refresh token 
 
-If no errors where encountered during the saving process you'll be able to see a refresh token generated on the fourth column of the row you configured previously.
-Congratulations! This token will be used for each dropbox api call to the related app storage.
+To synchronize remote templates stored on one of your own dropbox accounts add a dropbox app following these steps:
+- Specify a name
+- Specify the app_key
+- Specify the app_secret (see https://www.dropbox.com/developers/apps and copy them)
+- Click on "Generate and authorize refresh token" and follow the instructions to generate the one-time valid "access code"
+- Paste "access code" inside the input below the "Refresh Token Generator" column and click the button
+- Save the configuration clicking on the main configuration "Save" button
+- If no errors where encountered during the saving process you'll be able to see a refresh token generated on the fifth column of the row you configured previously.
+
+Congratulations! This credentials will be used for each dropbox api call to the related app storage.
 This configuration is managed as multi-row so you can add multiple dropbox apps related to different repositories simultaneously.
 
 
