@@ -89,16 +89,41 @@ class ApiKeySerialized extends \Magento\Config\Model\Config\Backend\Serialized\A
                     $remoteCursor->setData("storage_id", $row["app_key"]);
                 }
                 $this->remoteCursorRepository->save($remoteCursor);
-
-                if ($this->moduleConfig->isQueueManagementEnabled()) {
-                    $this->messagePublisher->publish('pbtemplate.import', $values[$key]);
-                } else {
-                    $this->remoteStorageManagement->updateRemoteTemplatesInformations(true, $values[$key]);
+                $this->synchronizeRemoteTemplates($values[$key]);
+            } elseif (isset($row["refresh_token"]) && $row["refresh_token"] !== "") {
+                try {
+                    $this->remoteCursorRepository->getByStorageId($row["app_key"]);
+                } catch (NoSuchEntityException $e) {
+                    $remoteCursor = $this->remoteCursorInterfaceFactory->create();
+                    $remoteCursor->setData("storage_id", $row["app_key"]);
+                    $latestCursor = $this->dropboxService->getLatestCursor(
+                        [],
+                        $row["app_key"],
+                        $row["app_secret"],
+                        $row['refresh_token']
+                    );
+                    if (isset($latestCursor["cursor"])) {
+                        $remoteCursor->setData(
+                            "latest_cursor",
+                            $latestCursor["cursor"]
+                        );
+                    }
+                    unset($values[$key]['access_code']);
+                    $this->remoteCursorRepository->save($remoteCursor);
+                    $this->synchronizeRemoteTemplates($values[$key]);
                 }
             }
         }
         $this->setValue($values);
         return parent::beforeSave();
+    }
+
+    public function synchronizeRemoteTemplates($values) {
+        if ($this->moduleConfig->isQueueManagementEnabled()) {
+            $this->messagePublisher->publish('pbtemplate.import', $values);
+        } else {
+            $this->remoteStorageManagement->updateRemoteTemplatesInformations(true, $values);
+        }
     }
 
     public function afterSave()
@@ -114,6 +139,8 @@ class ApiKeySerialized extends \Magento\Config\Model\Config\Backend\Serialized\A
         }
 
         foreach ($keyDiff as $key) {
+            $remoteCursor = $this->remoteCursorRepository->getByStorageId($key["app_key"]);
+            $this->remoteCursorRepository->delete($remoteCursor);
             $this->remoteStorageManagement->deleteRemoteTemplates($key);
         }
         return parent::afterSave();
