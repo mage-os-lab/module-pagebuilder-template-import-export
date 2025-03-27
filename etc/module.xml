@@ -3,7 +3,6 @@
     <module name="MageOS_PageBuilderTemplateImportExport">
         <sequence>
             <module name="Magento_PageBuilder"/>
-            <module name="MageOS_AsyncEvents"/>
         </sequence>
     </module>
 </config>
