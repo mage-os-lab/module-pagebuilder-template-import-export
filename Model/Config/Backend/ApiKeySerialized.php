@@ -129,19 +129,20 @@ class ApiKeySerialized extends \Magento\Config\Model\Config\Backend\Serialized\A
     public function afterSave()
     {
         $oldValue = $this->getOldValue();
-        $newValue = $this->getValue();
+        if (!empty($oldValue)) {
+            $newValue = $this->getValue();
+            $oldValue = $this->jsonSerializer->unserialize($oldValue);
+            $newValue = $this->jsonSerializer->unserialize($newValue);
+            $keyDiff = [];
+            if (is_array($newValue) && is_array($oldValue)) {
+                $keyDiff = array_diff_key($oldValue, $newValue);
+            }
 
-        $oldValue = $this->jsonSerializer->unserialize($oldValue);
-        $newValue = $this->jsonSerializer->unserialize($newValue);
-        $keyDiff = [];
-        if (is_array($newValue) && is_array($oldValue)) {
-            $keyDiff = array_diff_key($oldValue, $newValue);
-        }
-
-        foreach ($keyDiff as $key) {
-            $remoteCursor = $this->remoteCursorRepository->getByStorageId($key["app_key"]);
-            $this->remoteCursorRepository->delete($remoteCursor);
-            $this->remoteStorageManagement->deleteRemoteTemplates($key);
+            foreach ($keyDiff as $key) {
+                $remoteCursor = $this->remoteCursorRepository->getByStorageId($key["app_key"]);
+                $this->remoteCursorRepository->delete($remoteCursor);
+                $this->remoteStorageManagement->deleteRemoteTemplates($key);
+            }
         }
         return parent::afterSave();
     }
