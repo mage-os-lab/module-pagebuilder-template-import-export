@@ -96,7 +96,7 @@ class Collection extends RemoteTemplateCollection implements SearchResultInterfa
      * @return $this
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function setSearchCriteria(SearchCriteriaInterface $searchCriteria = null)
+    public function setSearchCriteria(?SearchCriteriaInterface $searchCriteria = null)
     {
         return $this;
     }
@@ -130,7 +130,7 @@ class Collection extends RemoteTemplateCollection implements SearchResultInterfa
      * @return $this
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function setItems(array $items = null)
+    public function setItems(?array $items = null)
     {
         return $this;
     }
