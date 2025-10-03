@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## 1.5.2
 ### Fixed
-- Fix error for template synch for credentials containing refresh_token 
+- Fix error for template sync for credentials containing refresh_token 
 
 ## 1.5.0
 ### Fixed

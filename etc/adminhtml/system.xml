@@ -17,9 +17,9 @@
                     <label>Enable</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="synch_templates_by_cron" translate="label,comment" type="select" sortOrder="10"
+                <field id="sync_templates_by_cron" translate="label,comment" type="select" sortOrder="10"
                        showInDefault="1" showInWebsite="0" showInStore="0">
-                    <label>Synch remote templates by cron</label>
+                    <label>Sync remote templates by cron</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment><![CDATA[Synchronize remote templates from dropbox by cron (suggested for large number of templates on stored remotely).<br/>Be sure to have "pbTemplateImport" on your env.php consumer list (See module documentation).<br/><strong>Remember to update and save this config before new credentials creation.</strong>]]></comment>
                 </field>

@@ -12,7 +12,7 @@ class ModuleConfig extends AbstractHelper
     const SECTION = 'pagebuilder_template_importexport/';
     const GENERAL_GROUP = self::SECTION . 'general/';
     const ENABLE = self::GENERAL_GROUP . 'enable';
-    const SYNCH_TEMPLATES_BY_CRON = self::GENERAL_GROUP . 'synch_templates_by_cron';
+    const SYNC_TEMPLATES_BY_CRON = self::GENERAL_GROUP . 'sync_templates_by_cron';
     const DROPBOX_CREDENTIALS = self::GENERAL_GROUP . 'dropbox_credentials';
 
     /**
@@ -68,7 +68,7 @@ class ModuleConfig extends AbstractHelper
     public function isQueueManagementEnabled(): bool
     {
         return $this->scopeConfig->isSetFlag(
-            self::SYNCH_TEMPLATES_BY_CRON,
+            self::SYNC_TEMPLATES_BY_CRON,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }

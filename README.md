@@ -87,7 +87,7 @@ The module provides configuration options under **Stores > Configuration > MageO
 #### General Configuration
 
 - **Enable**: Enables or disables the module. This setting is configurable on global scope.
-- **Synch remote templates by cron**:  Let you decide to synchronize remote templates by cron (suggested for large sets of templates stored on remote. See point 3 of installation chapter) or directly after configuration save.
+- **Sync remote templates by cron**:  Let you decide to synchronize remote templates by cron (suggested for large sets of templates stored on remote. See point 3 of installation chapter) or directly after configuration save.
 - **Dropbox repositories**: Allows you to specify the Dropbox apps from which to receive templates.
 
 
