@@ -53,7 +53,6 @@
                     </item>
                     <item name="required" xsi:type="boolean">false</item>
                     <item name="allowedExtensions" xsi:type="string">zip</item>
-                    <item name="maxFileSize" xsi:type="string">4194304</item>
                     <item name="tooltip" xsi:type="array">
                         <item name="description" xsi:type="string" translate="true">Use zip archive previously exported.</item>
                     </item>

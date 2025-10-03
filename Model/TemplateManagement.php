@@ -86,7 +86,7 @@ class TemplateManagement implements TemplateManagementInterface
      * @param string|null $destinationPath
      * @return array
      */
-    protected function copyAssetsFilesToMediaDirectory(string $sourcePath, string $destinationPath = null): array
+    protected function copyAssetsFilesToMediaDirectory(string $sourcePath, ?string $destinationPath = null): array
     {
         $exceptionMessages = [];
         if (!is_dir($sourcePath)) {

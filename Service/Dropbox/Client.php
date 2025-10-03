@@ -24,7 +24,7 @@ class Client extends \Spatie\Dropbox\Client
      * @param  array<string, string|bool|array<string>>|null  $parameters
      * @return array<mixed>
      */
-    public function apiEndpointRequest(string $endpoint, array $parameters = null): array
+    public function apiEndpointRequest(string $endpoint, ?array $parameters = null): array
     {
         try {
             $options = ['headers' => $this->getHeaders()];
