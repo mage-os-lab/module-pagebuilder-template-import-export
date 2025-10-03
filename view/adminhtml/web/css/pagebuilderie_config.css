@@ -1,8 +1,8 @@
-#pagebuilder_template_importexport_general table colgroup.label,
-#pagebuilder_template_importexport_general table tr td.label  {
+#cms_pagebuilder_template_importexport table colgroup.label,
+#cms_pagebuilder_template_importexport table tr td.label  {
     width: 20%;
 }
-#pagebuilder_template_importexport_general table colgroup.value,
-#pagebuilder_template_importexport_general table tr td.value  {
+#cms_pagebuilder_template_importexport table colgroup.value,
+#cms_pagebuilder_template_importexport table tr td.value  {
     width: 80%;
 }

@@ -4,7 +4,7 @@
         <block class="Magento\Backend\Block\Template" name="pagebuilder.template.import"
                template="MageOS_PageBuilderTemplateImportExport::import/modal.phtml"
                aclResource="MageOS_PageBuilderTemplateImportExport::pagebuilder_template_import"
-               ifconfig="pagebuilder_template_importexport/general/enable"
+               ifconfig="cms/pagebuilder_template_importexport/enable"
         >
             <uiComponent name="pagebuilder_template_import_form"/>
             <uiComponent name="pagebuilder_remotetemplate_grid"/>

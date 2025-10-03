@@ -9,8 +9,8 @@ use Magento\Framework\App\Helper\Context;
 
 class ModuleConfig extends AbstractHelper
 {
-    const SECTION = 'pagebuilder_template_importexport/';
-    const GENERAL_GROUP = self::SECTION . 'general/';
+    const SECTION = 'cms/';
+    const GENERAL_GROUP = self::SECTION . 'pagebuilder_template_importexport/';
     const ENABLE = self::GENERAL_GROUP . 'enable';
     const SYNC_TEMPLATES_BY_CRON = self::GENERAL_GROUP . 'sync_templates_by_cron';
     const DROPBOX_CREDENTIALS = self::GENERAL_GROUP . 'dropbox_credentials';
