@@ -17,7 +17,7 @@ use Psr\Log\LoggerInterface;
 class Import extends Action implements HttpPostActionInterface
 {
 
-    public const ADMIN_RESOURCE = 'MageOS_PageBuilderTemplateImportExport::pagebuilder_template_import';
+    public const ADMIN_RESOURCE = 'Magento_Cms::config_cms';
 
     /**
      * @param LoggerInterface $logger

@@ -19,7 +19,7 @@ use Psr\Log\LoggerInterface;
 class Export extends Action implements HttpGetActionInterface
 {
 
-    public const ADMIN_RESOURCE = 'MageOS_PageBuilderTemplateImportExport::pagebuilder_template_export';
+    public const ADMIN_RESOURCE = 'Magento_Cms::config_cms';
 
     /**
      * @param LoggerInterface $logger

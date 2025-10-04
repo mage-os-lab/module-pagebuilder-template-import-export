@@ -10,8 +10,14 @@ Enrich PageBuilder adding templates import/export management.
 The **PageBuilder Templates Import/Export** module allows you to import and export pagebuilder templates through different magento instances.
 You can use it exporting zip templates file locally and move to remote instances or pulling directly from a configured dropbox storage.
 
+![remote_template_import](./doc/importremotetemplate_screenshot.png)
+![remote_template_import_confirmation](./doc/importremotetemplate2_screenshot.png)
+![remote_template_imported](./doc/importremotetemplate3_screenshot.png)
+![apply_template](./doc/applytemplate_screenshot.png)
+![template_applied](./doc/applytemplate2_screenshot.png)
 
-## Features
+
+## 🚀 Features
 
 ### Export Template
 
@@ -43,7 +49,7 @@ An alignment is done once per day at 0:00 but you can also make a full alignment
 php bin/magento mage-os:pagebuilder_template:update-remote-list
 ```
 
-## Installation
+## 🔧 Installation
 
 1. Install it into your Mage-OS/Magento 2 project with composer:
     ```
@@ -79,7 +85,7 @@ php bin/magento mage-os:pagebuilder_template:update-remote-list
     ```
 
 
-## Configuration
+## ⚙️ Configuration
 
 The module provides configuration options under **Stores > Configuration > MageOS > Pagebuilder template import/export**
 
@@ -120,6 +126,9 @@ If you're configuring your own dropbox application for your Dropbox Account you 
 1) Select "Scoped Access" on "Choose an API" section
 2) Select "Full Dropbox" on "Choose the type of access you need" section
 3) Add an app name ex: "My Mage-OS Template Storage"
+
+![app_connection](./doc/configuration_screenshot.png)
+![app_connected](./doc/configuration2_screenshot.png)
  
 
 #### Dropbox app Configuration
@@ -137,11 +146,11 @@ If correct, your Magento instance will be updated realtime for any update on you
 If you're not the owner of the Dropbox you must ask for webhook update to the owner.
 
 
-## Changelog
+## 🤝 Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
 
 
-## License
+## 📄 License
 
 The MIT License (MIT). Please see [License File](LICENSE) for more information.
