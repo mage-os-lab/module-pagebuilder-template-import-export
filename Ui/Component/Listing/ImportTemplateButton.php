@@ -11,7 +11,7 @@ class ImportTemplateButton implements ButtonProviderInterface
 {
 
     private const ACL_PAGEBUILDER_IMPORT_TEMPLATES =
-        'MageOS_PageBuilderTemplateImportExport::pagebuilder_template_import';
+        'Magento_Cms::config_cms';
 
     /**
      * @param AuthorizationInterface $authorization

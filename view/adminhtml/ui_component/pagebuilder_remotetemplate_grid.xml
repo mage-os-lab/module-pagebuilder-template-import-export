@@ -10,7 +10,7 @@
         <item name="template" xsi:type="string">templates/remote-list</item>
         <item name="label" xsi:type="string" translate="true">Remote Templates List</item>
         <item name="comment" xsi:type="string" translate="true">
-            <![CDATA[Templates are synchronized from each configured dropbox repository. See "Stores > Configuration > Mage-OS > Pagebuilder template import/export" configuration.]]>
+            <![CDATA[Templates are synchronized from each configured dropbox repository. See "Stores > Configuration > General > Content Management > Pagebuilder template import/export" configuration.]]>
         </item>
     </argument>
     <settings>

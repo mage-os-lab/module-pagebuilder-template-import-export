@@ -3,6 +3,7 @@
     <module name="MageOS_PageBuilderTemplateImportExport">
         <sequence>
             <module name="Magento_PageBuilder"/>
+            <module name="Magento_Cms"/>
         </sequence>
     </module>
 </config>

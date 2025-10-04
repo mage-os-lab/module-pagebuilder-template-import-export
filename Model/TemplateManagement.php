@@ -20,6 +20,7 @@ use MageOS\PageBuilderTemplateImportExport\Helper\Aliases as TemplateAliasHelper
 use Magento\PageBuilder\Model\TemplateRepository;
 use MageOS\PageBuilderTemplateImportExport\DataConverter\CmsConverter;
 use Magento\Framework\Filesystem;
+use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\Filesystem\Driver\File as FileDriver;
 use Magento\Framework\Api\ImageContentFactory;
 use Magento\Framework\Api\ImageContentValidator;
@@ -27,7 +28,6 @@ use Magento\PageBuilder\Model\TemplateFactory;
 use Magento\Framework\Image\AdapterFactory;
 use Magento\MediaStorage\Helper\File\Storage\Database;
 use Magento\Framework\Convert\ConvertArray;
-use Magento\Framework\Filesystem\Driver\File;
 use Magento\Cms\Model\BlockFactory;
 use Magento\Cms\Api\BlockRepositoryInterface;
 use Magento\Framework\Xml\Parser as XmlParser;
@@ -40,7 +40,8 @@ class TemplateManagement implements TemplateManagementInterface
     /**
      * @param CmsConverter $cmsConverter
      * @param Filesystem $filesystem
-     * @param File $fileDriver
+     * @param File $fileIo
+     * @param FileDriver $fileDriver
      * @param StoreManagerInterface $storeManager
      * @param TemplateRepository $templateRepository
      * @param TemplateFactory $templateFactory
@@ -59,6 +60,7 @@ class TemplateManagement implements TemplateManagementInterface
      */
     public function __construct(
         protected CmsConverter $cmsConverter,
+        protected File $fileIo,
         protected Filesystem $filesystem,
         protected FileDriver $fileDriver,
         protected StoreManagerInterface $storeManager,
@@ -117,6 +119,9 @@ class TemplateManagement implements TemplateManagementInterface
                 } else {
                     if (substr($destinationPath, -1) !== "/") {
                         $destinationPath = $destinationPath . "/";
+                    }
+                    if (!$this->fileIo->fileExists($destinationPath, false)) {
+                        $this->fileIo->mkdir($destinationPath);
                     }
                     $this->fileDriver->copy($entity->getPathname(), $destinationPath . $entity->getFilename());
                 }

@@ -42,7 +42,7 @@ class TemplateManagerActionsPlugin
 
                     if (isset($item[$indexField])) {
                         if ($this->authorization->isAllowed(
-                            'MageOS_PageBuilderTemplateImportExport::pagebuilder_template_export'
+                            'Magento_Cms::config_cms'
                         )) {
                             $item[$name]['export'] = [
                                 'label' => __('Export'),

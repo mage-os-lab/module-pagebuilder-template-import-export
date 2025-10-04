@@ -51,43 +51,4 @@
             </argument>
         </arguments>
     </type>
-
-    <!-- CUSTOM LOGGER -->
-    <virtualType name="MageOS\PageBuilderTemplateImportExport\LoggerHanlder" type="Magento\Framework\Logger\Handler\Base">
-        <arguments>
-            <argument name="fileName" xsi:type="string">/var/log/pagebuilder-template-import-export.log</argument>
-        </arguments>
-    </virtualType>
-    <virtualType name="MageOS\PageBuilderTemplateImportExport\Logger" type="Magento\Framework\Logger\Monolog">
-        <arguments>
-            <argument name="handlers" xsi:type="array">
-                <item name="debug" xsi:type="object">MageOS\PageBuilderTemplateImportExport\LoggerHanlder</item>
-            </argument>
-        </arguments>
-    </virtualType>
-    <type name="MageOS\PageBuilderTemplateImportExport\Cron\UpdateRemoteTemplateList">
-        <arguments>
-            <argument name="logger" xsi:type="object">MageOS\PageBuilderTemplateImportExport\Logger</argument>
-        </arguments>
-    </type>
-    <type name="MageOS\PageBuilderTemplateImportExport\Controller\Adminhtml\Template\Remote\Import">
-        <arguments>
-            <argument name="logger" xsi:type="object">MageOS\PageBuilderTemplateImportExport\Logger</argument>
-        </arguments>
-    </type>
-    <type name="MageOS\PageBuilderTemplateImportExport\Controller\Adminhtml\Template\Export">
-        <arguments>
-            <argument name="logger" xsi:type="object">MageOS\PageBuilderTemplateImportExport\Logger</argument>
-        </arguments>
-    </type>
-    <type name="MageOS\PageBuilderTemplateImportExport\Controller\Adminhtml\Template\Remote\Sync">
-        <arguments>
-            <argument name="logger" xsi:type="object">MageOS\PageBuilderTemplateImportExport\Logger</argument>
-        </arguments>
-    </type>
-    <type name="MageOS\PageBuilderTemplateImportExport\Model\TemplateTriggerHandler">
-        <arguments>
-            <argument name="logger" xsi:type="object">MageOS\PageBuilderTemplateImportExport\Logger</argument>
-        </arguments>
-    </type>
 </config>

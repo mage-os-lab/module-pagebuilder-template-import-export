@@ -87,7 +87,7 @@ php bin/magento mage-os:pagebuilder_template:update-remote-list
 
 ## ⚙️ Configuration
 
-The module provides configuration options under **Stores > Configuration > MageOS > Pagebuilder template import/export**
+The module provides configuration options under **Stores > Configuration > General > Content Management > Pagebuilder template import/export**
 
 
 #### General Configuration

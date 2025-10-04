@@ -3,7 +3,7 @@
     <referenceContainer name="content">
         <block class="Magento\Backend\Block\Template" name="pagebuilder.template.import"
                template="MageOS_PageBuilderTemplateImportExport::import/modal.phtml"
-               aclResource="MageOS_PageBuilderTemplateImportExport::pagebuilder_template_import"
+               aclResource="Magento_Cms::config_cms"
                ifconfig="cms/pagebuilder_template_importexport/enable"
         >
             <uiComponent name="pagebuilder_template_import_form"/>

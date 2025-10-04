@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## 1.5.3
 ### Fixed
-- Fix issue #1 for error throwed saving configurations with empty dropbox settings at first install.
+- Fix issue #1 for error generated saving configurations with empty dropbox settings at first install.
 
 ## 1.5.2
 ### Fixed
