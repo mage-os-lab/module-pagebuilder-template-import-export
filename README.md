@@ -53,7 +53,7 @@ php bin/magento mage-os:pagebuilder_template:update-remote-list
 
 1. Install it into your Mage-OS/Magento 2 project with composer:
     ```
-    composer require mage-os/module-pagebuilder-template-import-export
+    composer require mage-os/module-page-builder-template-import-export
     ```
 
 2. Enable module
