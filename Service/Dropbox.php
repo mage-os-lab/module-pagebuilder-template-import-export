@@ -25,6 +25,8 @@ class Dropbox implements DropboxInterface
      * @param DropboxFactory $dropboxClient
      * @param File $file
      * @param DirectoryList $directoryList
+     * @param ConfigCache $cache
+     * @param ModuleConfig $config
      */
     public function __construct(
         protected DropboxFactory $dropboxClient,

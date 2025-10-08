@@ -3,10 +3,16 @@
 namespace MageOS\PageBuilderTemplateImportExport\Service\Dropbox;
 
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\GuzzleException;
 
 class Client extends \Spatie\Dropbox\Client
 {
 
+    /**
+     * @param string $subdomain
+     * @param string $endpoint
+     * @return string
+     */
     protected function getEndpointUrl(string $subdomain, string $endpoint): string
     {
         if (count($parts = explode('::', $endpoint)) === 2) {
@@ -21,8 +27,10 @@ class Client extends \Spatie\Dropbox\Client
     }
 
     /**
-     * @param  array<string, string|bool|array<string>>|null  $parameters
-     * @return array<mixed>
+     * @param string $endpoint
+     * @param array|null $parameters
+     * @return array
+     * @throws GuzzleException
      */
     public function apiEndpointRequest(string $endpoint, ?array $parameters = null): array
     {

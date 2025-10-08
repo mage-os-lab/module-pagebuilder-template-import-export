@@ -24,8 +24,6 @@ class TemplateManagerActionsPlugin
     }
 
     /**
-     * Add export action to data source
-     *
      * @param TemplateManagerActions $subject
      * @param array $result
      * @return array

@@ -17,7 +17,7 @@ class PreviewImage extends Column
      * @param array $dataSource
      * @return array
      */
-    public function prepareDataSource(array $dataSource)
+    public function prepareDataSource(array $dataSource): array
     {
         if (isset($dataSource['data']['items'])) {
             $fieldName = $this->getData('name');
@@ -39,7 +39,7 @@ class PreviewImage extends Column
      *
      * @return null|string
      */
-    private function getAlt($row)
+    private function getAlt($row): ?string
     {
         $altField = $this->getData('config/altField') ?: self::ALT_FIELD;
         return $row[$altField] ?? null;

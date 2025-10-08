@@ -58,7 +58,8 @@ class DataProvider extends \Magento\Framework\View\Element\UiComponent\DataProvi
     }
 
     /**
-     * @inheritDoc
+     * @param Filter $filter
+     * @return $this|mixed|void
      */
     public function addFilter(Filter $filter)
     {

@@ -18,12 +18,15 @@ use Psr\Log\LoggerInterface;
 class Import extends Action implements HttpPostActionInterface
 {
 
-    public const ADMIN_RESOURCE = 'Magento_Cms::config_cms';
+    public const ADMIN_RESOURCE = 'MageOS_PageBuilderTemplateImportExport::pagebuilder_template_import';
 
     /**
      * @param LoggerInterface $logger
      * @param TemplateManagementInterface $templateManagement
      * @param Filesystem $filesystem
+     * @param RemoteTemplateRepositoryInterface $remoteTemplateRepository
+     * @param Dropbox $dropbox
+     * @param ModuleConfig $moduleConfig
      * @param Context $context
      */
     public function __construct(

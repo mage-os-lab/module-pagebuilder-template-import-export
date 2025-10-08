@@ -11,10 +11,11 @@ class ImportTemplateButton implements ButtonProviderInterface
 {
 
     private const ACL_PAGEBUILDER_IMPORT_TEMPLATES =
-        'Magento_Cms::config_cms';
+        'MageOS_PageBuilderTemplateImportExport::pagebuilder_template_import';
 
     /**
      * @param AuthorizationInterface $authorization
+     * @param ModuleConfig $moduleConfig
      */
     public function __construct(
         protected AuthorizationInterface $authorization,
@@ -25,7 +26,7 @@ class ImportTemplateButton implements ButtonProviderInterface
     /**
      * @inheritdoc
      */
-    public function getButtonData()
+    public function getButtonData(): array
     {
         if (!$this->isAllowed() || !$this->moduleConfig->isEnabled()) {
             return [];

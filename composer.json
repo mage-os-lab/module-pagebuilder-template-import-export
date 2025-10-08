@@ -1,5 +1,5 @@
 {
-    "name": "mage-os/module-pagebuilder-template-import-export",
+    "name": "mage-os/module-page-builder-template-import-export",
     "description": "PageBuilder template import/export module",
     "type": "magento2-module",
     "license": [
